@@ -6,11 +6,13 @@ import (
 )
 
 type Services struct {
+	Auth interfaces.UserAuthService
 	User interfaces.UserService
 }
 
 func NewServices(db interfaces.Storage) *Services {
 	return &Services{
+		Auth: user.NewAuthService(db),
 		User: user.NewUserService(db),
 	}
 }

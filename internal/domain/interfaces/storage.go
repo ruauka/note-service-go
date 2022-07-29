@@ -6,9 +6,10 @@ import (
 )
 
 type Storage interface {
-	GetAllUsers() ([]dto.UserResponse, error)
-	GetUserByID(id string) (*model.User, error)
-	CreateUser(user *model.User) (*model.User, error)
+	RegisterUser(user *model.User) (*model.User, error)
+	GetUserForAuth(userName, password string) (*model.User, error)
+	GetAllUsers() ([]dto.UserResp, error)
+	GetUserByID(id string) (*dto.UserResp, error)
 	UpdateUser(newUser *dto.UserUpdate, userId string) error
 	DeleteUser(id string) (int, error)
 }

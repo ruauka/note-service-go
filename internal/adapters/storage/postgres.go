@@ -2,7 +2,6 @@ package storage
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/jmoiron/sqlx"
@@ -25,41 +24,37 @@ func NewStorage(pgDB *sqlx.DB) interfaces.Storage {
 	return &storage{db: pgDB}
 }
 
-func (s *storage) CreateUser(user *model.User) (*model.User, error) {
-	tx, err := s.db.Begin()
-	if err != nil {
+func (s *storage) RegisterUser(user *model.User) (*model.User, error) {
+	query := fmt.Sprintf("INSERT INTO %s (username, password) VALUES ($1, $2) RETURNING id", UsersTable)
+	if err := s.db.QueryRow(query, user.Username, user.Password).Scan(&user.ID); err != nil {
 		return nil, err
 	}
 
-	var id int
-	createUserQuery := fmt.Sprintf("INSERT INTO %s (username, password) VALUES ($1, $2) RETURNING id", UsersTable)
-	row := tx.QueryRow(createUserQuery, user.Username, user.Password)
-	if err := row.Scan(&id); err != nil {
-		if err := tx.Rollback(); err != nil {
-			return nil, err
-		}
-		return nil, err
-	}
-
-	user.ID = strconv.Itoa(id)
-
-	return user, tx.Commit()
+	return user, nil
 }
 
-func (s *storage) GetUserByID(id string) (*model.User, error) {
+func (s *storage) GetUserForAuth(userName, password string) (*model.User, error) {
 	var user model.User
 
-	getUserBuIdQuery := fmt.Sprintf("SELECT * FROM %s WHERE id=$1", UsersTable)
+	query := fmt.Sprintf("SELECT id FROM %s WHERE username=$1 AND password=$2", UsersTable)
+	err := s.db.Get(&user, query, userName, password)
 
-	if err := s.db.Get(&user, getUserBuIdQuery, id); err != nil {
+	return &user, err
+}
+
+func (s *storage) GetUserByID(id string) (*dto.UserResp, error) {
+	var user dto.UserResp
+
+	query := fmt.Sprintf("SELECT id, username FROM %s WHERE id=$1", UsersTable)
+	if err := s.db.Get(&user, query, id); err != nil {
 		return nil, err
 	}
 
 	return &user, nil
 }
 
-func (s *storage) GetAllUsers() ([]dto.UserResponse, error) {
-	var users []dto.UserResponse
+func (s *storage) GetAllUsers() ([]dto.UserResp, error) {
+	var users []dto.UserResp
 
 	getAllUsersQuery := fmt.Sprintf("SELECT id, username FROM %s", UsersTable)
 	if err := s.db.Select(&users, getAllUsersQuery); err != nil {

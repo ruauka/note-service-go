@@ -2,10 +2,8 @@ package user
 
 import (
 	"web/internal/domain/enteties/dto"
-	"web/internal/domain/enteties/model"
 	"web/internal/domain/errors"
 	"web/internal/domain/interfaces"
-	"web/internal/domain/services/utils"
 )
 
 type userService struct {
@@ -17,7 +15,7 @@ func NewUserService(db interfaces.Storage) interfaces.UserService {
 	return &userService{storage: db}
 }
 
-func (u *userService) GetAllUsers() ([]dto.UserResponse, error) {
+func (u *userService) GetAllUsers() ([]dto.UserResp, error) {
 	users, err := u.storage.GetAllUsers()
 	if len(users) == 0 {
 		return nil, errors.ErrUsersListEmpty
@@ -25,13 +23,8 @@ func (u *userService) GetAllUsers() ([]dto.UserResponse, error) {
 	return users, err
 }
 
-func (u *userService) GetUserByID(id string) (*model.User, error) {
+func (u *userService) GetUserByID(id string) (*dto.UserResp, error) {
 	return u.storage.GetUserByID(id)
-}
-
-func (u *userService) CreateUser(user *model.User) (*model.User, error) {
-	user.Password = utils.GeneratePasswordHash(user.Password)
-	return u.storage.CreateUser(user)
 }
 
 func (u *userService) UpdateUser(newUser *dto.UserUpdate, userId string) error {

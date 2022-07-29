@@ -10,7 +10,7 @@ const (
 	usersURL = "/users"
 	userURL  = "/users/:id"
 	register = "/register"
-	auth = "/auth"
+	auth     = "/auth"
 )
 
 type handler struct {
@@ -27,11 +27,10 @@ func NewHandler(service *services.Services) *handler {
 func Register(router *httprouter.Router, service *services.Services) {
 	h := NewHandler(service)
 
-	router.POST(register, h.Register)
-	//router.POST(auth, h.Auth)
+	router.POST(register, h.RegisterUser)
+	router.POST(auth, h.GenerateToken)
 	router.GET(usersURL, h.GetAllUsers)
 	router.GET(userURL, h.GetUserByID)
-	router.POST(usersURL, h.CreateUser)
 	router.PUT(userURL, h.UpdateUser)
 	router.DELETE(userURL, h.DeleteUser)
 }

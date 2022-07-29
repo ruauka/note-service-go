@@ -5,7 +5,12 @@ type UserUpdate struct {
 	Password *string `json:"password"`
 }
 
-type UserResponse struct {
+type UserAuth struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type UserResp struct {
 	ID       string `json:"id"`
 	Username string `json:"username"`
 }

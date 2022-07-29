@@ -3,8 +3,14 @@ package config
 import (
 	"log"
 	"sync"
+	"time"
 
 	"github.com/ilyakaznacheev/cleanenv"
+)
+
+const (
+	SigningKey  = "secret"
+	ExpDuration = time.Hour * 12
 )
 
 type Config struct {

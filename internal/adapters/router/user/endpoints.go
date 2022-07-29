@@ -13,14 +13,46 @@ import (
 	"web/internal/domain/errors"
 )
 
-func (h *handler) Register(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *handler) RegisterUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	user := &model.User{}
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 		http.Error(w, err.Error(), 400)
 		return
 	}
 
+	user, err := h.service.Auth.RegisterUser(user)
+	if err != nil {
+		router.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		return
+	}
 
+	resp := make(map[string]string)
+	resp[fmt.Sprintf("Создан пользователь '%s' с id", user.Username)] = user.ID
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(resp)
+}
+
+func (h *handler) GenerateToken(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	user := dto.UserAuth{}
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+
+	token, err := h.service.Auth.GenerateToken(user.Username, user.Password)
+	if err != nil {
+		router.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		return
+	}
+
+	resp := make(map[string]string)
+	resp["token"] = token
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(resp)
 }
 
 func (h *handler) GetAllUsers(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -45,27 +77,6 @@ func (h *handler) GetUserByID(w http.ResponseWriter, r *http.Request, ps httprou
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(user)
-}
-
-func (h *handler) CreateUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	user := &model.User{}
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-		http.Error(w, err.Error(), 400)
-		return
-	}
-
-	user, err := h.service.User.CreateUser(user)
-	if err != nil {
-		router.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
-		return
-	}
-
-	resp := make(map[string]string)
-	resp[fmt.Sprintf("Создан пользователь '%s' с id", user.Username)] = user.ID
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(resp)
 }
 
 func (h *handler) UpdateUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
