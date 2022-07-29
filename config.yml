@@ -1,0 +1,8 @@
+postgres:
+  host: localhost
+  port: 5432
+  username: pg
+  dbName: crud
+  sslMode: disable
+app:
+  port: 8000
