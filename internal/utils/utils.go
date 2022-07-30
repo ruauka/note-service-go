@@ -1,14 +1,24 @@
-package router
+package utils
 
 import (
+	"crypto/sha1"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 )
 
-//type respError struct {
-//	Message string `json:"message"`
-//}
+const (
+	UsersTable = "users"
+)
+
+const salt = "abc"
+
+func GeneratePasswordHash(password string) string {
+	hash := sha1.New()
+	hash.Write([]byte(password))
+	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
+}
 
 // SetErrRespHeaders - установка необходимых хедеров для ответа с ошибкой.
 func SetErrRespHeaders(w http.ResponseWriter, httpStatus int) http.ResponseWriter {
@@ -35,5 +45,3 @@ func Abort(w http.ResponseWriter, httpStatus int, err, errDesc error) {
 	json.NewEncoder(SetErrRespHeaders(w, httpStatus)).Encode(MapErrCreate(err, errDesc))
 	log.Println(errDesc.Error())
 }
-
-

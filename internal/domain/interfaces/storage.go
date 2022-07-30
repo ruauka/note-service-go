@@ -5,9 +5,12 @@ import (
 	"web/internal/domain/enteties/model"
 )
 
-type Storage interface {
+type UserAuthStorage interface {
 	RegisterUser(user *model.User) (*model.User, error)
-	GetUserForAuth(userName, password string) (*model.User, error)
+	GetUserForToken(userName, password string) (*model.User, error)
+}
+
+type UserStorage interface {
 	GetAllUsers() ([]dto.UserResp, error)
 	GetUserByID(id string) (*dto.UserResp, error)
 	UpdateUser(newUser *dto.UserUpdate, userId string) error

@@ -1,6 +1,7 @@
 package services
 
 import (
+	"web/internal/adapters/storage"
 	"web/internal/domain/interfaces"
 	"web/internal/domain/services/user"
 )
@@ -10,9 +11,9 @@ type Services struct {
 	User interfaces.UserService
 }
 
-func NewServices(db interfaces.Storage) *Services {
+func NewServices(db *storage.Storages) *Services {
 	return &Services{
-		Auth: user.NewAuthService(db),
-		User: user.NewUserService(db),
+		Auth: user.NewAuthService(db.Auth),
+		User: user.NewUserService(db.User),
 	}
 }

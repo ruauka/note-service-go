@@ -7,11 +7,11 @@ import (
 )
 
 type userService struct {
-	storage interfaces.Storage
+	storage interfaces.UserStorage
 	// logger
 }
 
-func NewUserService(db interfaces.Storage) interfaces.UserService {
+func NewUserService(db interfaces.UserStorage) interfaces.UserService {
 	return &userService{storage: db}
 }
 

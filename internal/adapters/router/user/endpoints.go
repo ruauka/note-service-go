@@ -7,10 +7,10 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 
-	"web/internal/adapters/router"
 	"web/internal/domain/enteties/dto"
 	"web/internal/domain/enteties/model"
 	"web/internal/domain/errors"
+	"web/internal/utils"
 )
 
 func (h *handler) RegisterUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -22,7 +22,7 @@ func (h *handler) RegisterUser(w http.ResponseWriter, r *http.Request, _ httprou
 
 	user, err := h.service.Auth.RegisterUser(user)
 	if err != nil {
-		router.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
 		return
 	}
 
@@ -43,7 +43,7 @@ func (h *handler) GenerateToken(w http.ResponseWriter, r *http.Request, _ httpro
 
 	token, err := h.service.Auth.GenerateToken(user.Username, user.Password)
 	if err != nil {
-		router.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
 		return
 	}
 
@@ -51,14 +51,14 @@ func (h *handler) GenerateToken(w http.ResponseWriter, r *http.Request, _ httpro
 	resp["token"] = token
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(resp)
 }
 
 func (h *handler) GetAllUsers(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	users, err := h.service.User.GetAllUsers()
 	if err != nil {
-		router.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
 		return
 	}
 
@@ -70,7 +70,7 @@ func (h *handler) GetAllUsers(w http.ResponseWriter, r *http.Request, _ httprout
 func (h *handler) GetUserByID(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	user, err := h.service.User.GetUserByID(ps.ByName("id"))
 	if err != nil {
-		router.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
 		return
 	}
 
@@ -88,13 +88,13 @@ func (h *handler) UpdateUser(w http.ResponseWriter, r *http.Request, ps httprout
 
 	_, err := h.service.User.GetUserByID(ps.ByName("id"))
 	if err != nil {
-		router.Abort(w, http.StatusBadRequest, err, errors.ErrUserNotExists)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrUserNotExists)
 		return
 	}
 
 	err = h.service.User.UpdateUser(newUser, ps.ByName("id"))
 	if err != nil {
-		router.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
 		return
 	}
 
@@ -109,7 +109,7 @@ func (h *handler) UpdateUser(w http.ResponseWriter, r *http.Request, ps httprout
 func (h *handler) DeleteUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	id, err := h.service.User.DeleteUser(ps.ByName("id"))
 	if err != nil {
-		router.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
 		return
 	}
 

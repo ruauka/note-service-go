@@ -10,15 +10,15 @@ import (
 	"web/internal/domain/enteties/dto"
 	"web/internal/domain/enteties/model"
 	"web/internal/domain/interfaces"
-	"web/internal/domain/services/utils"
+	"web/internal/utils"
 )
 
 type authService struct {
-	storage interfaces.Storage
+	storage interfaces.UserAuthStorage
 	// logger
 }
 
-func NewAuthService(db interfaces.Storage) interfaces.UserAuthService {
+func NewAuthService(db interfaces.UserAuthStorage) interfaces.UserAuthService {
 	return &authService{storage: db}
 }
 
@@ -28,7 +28,7 @@ func (a *authService) RegisterUser(user *model.User) (*model.User, error) {
 }
 
 func (a *authService) GenerateToken(userName, password string) (string, error) {
-	user, err := a.storage.GetUserForAuth(userName, utils.GeneratePasswordHash(password))
+	user, err := a.storage.GetUserForToken(userName, utils.GeneratePasswordHash(password))
 	if err != nil {
 		return "", err
 	}

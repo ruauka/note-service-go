@@ -29,7 +29,7 @@ func Execute() {
 		log.Fatalf("failed to init db: %s", err.Error())
 	}
 
-	pgDB := storage.NewStorage(db)
+	pgDB := storage.NewStorages(db)
 	service := services.NewServices(pgDB)
 
 	router := httprouter.New()
