@@ -4,13 +4,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 
 	"web/internal/domain/services"
-)
-
-const (
-	usersURL = "/users"
-	userURL  = "/users/:id"
-	register = "/register"
-	auth     = "/auth"
+	"web/internal/utils"
 )
 
 type handler struct {
@@ -27,10 +21,10 @@ func NewHandler(service *services.Services) *handler {
 func Register(router *httprouter.Router, service *services.Services) {
 	h := NewHandler(service)
 
-	router.POST(register, h.RegisterUser)
-	router.POST(auth, h.GenerateToken)
-	router.GET(usersURL, h.GetAllUsers)
-	router.GET(userURL, h.GetUserByID)
-	router.PUT(userURL, h.UpdateUser)
-	router.DELETE(userURL, h.DeleteUser)
+	router.POST(utils.Register, h.RegisterUser)
+	router.POST(utils.Auth, h.GenerateToken)
+	router.GET(utils.UsersURL, h.GetAllUsers)
+	router.GET(utils.UserURL, h.GetUserByID)
+	router.PUT(utils.UserURL, h.UpdateUser)
+	router.DELETE(utils.UserURL, h.DeleteUser)
 }

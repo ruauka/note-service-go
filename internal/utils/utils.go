@@ -9,6 +9,13 @@ import (
 )
 
 const (
+	UsersURL = "/users"
+	UserURL  = "/users/:id"
+	Register = "/register"
+	Auth     = "/auth"
+)
+
+const (
 	UsersTable = "users"
 )
 
