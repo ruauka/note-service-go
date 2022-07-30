@@ -1,12 +1,12 @@
 package user
 
 import (
+	"errors"
 	"log"
 	"time"
 
 	"github.com/golang-jwt/jwt"
 
-	"web/internal/config"
 	"web/internal/domain/enteties/dto"
 	"web/internal/domain/enteties/model"
 	"web/internal/domain/interfaces"
@@ -35,15 +35,35 @@ func (a *authService) GenerateToken(userName, password string) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, dto.TokenClaims{
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(config.ExpDuration).Unix(),
+			ExpiresAt: time.Now().Add(utils.ExpDuration).Unix(),
 		},
 		UserID: user.ID,
 	})
 
-	tokenString, err := token.SignedString([]byte(config.SigningKey))
+	tokenString, err := token.SignedString([]byte(utils.SigningKey))
 	if err != nil {
 		log.Println(err)
 	}
 
 	return tokenString, nil
+}
+
+func (a *authService) ParseToken(accessToken string) (string, error) {
+	token, err := jwt.ParseWithClaims(accessToken, &dto.TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("invalid signing method")
+		}
+		return []byte(utils.SigningKey), nil
+	})
+
+	if err != nil {
+		return "", err
+	}
+
+	claims, ok := token.Claims.(*dto.TokenClaims)
+	if !ok {
+		return "", errors.New("token claims are not of type *dto.TokenClaims")
+	}
+
+	return claims.UserID, nil
 }

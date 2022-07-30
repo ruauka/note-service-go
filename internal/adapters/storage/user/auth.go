@@ -27,11 +27,11 @@ func (s *userAuthStorage) RegisterUser(user *model.User) (*model.User, error) {
 	return user, nil
 }
 
-func (s *userAuthStorage) GetUserForToken(userName, password string) (*model.User, error) {
+func (s *userAuthStorage) GetUserForToken(userName, passwordHash string) (*model.User, error) {
 	var user model.User
 
 	query := fmt.Sprintf("SELECT id FROM %s WHERE username=$1 AND password=$2", utils.UsersTable)
-	err := s.db.Get(&user, query, userName, password)
+	err := s.db.Get(&user, query, userName, passwordHash)
 
 	return &user, err
 }

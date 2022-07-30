@@ -8,6 +8,7 @@ import (
 type UserAuthService interface {
 	RegisterUser(user *model.User) (*model.User, error)
 	GenerateToken(userName, password string) (string, error)
+	ParseToken(token string) (string, error)
 }
 
 type UserService interface {

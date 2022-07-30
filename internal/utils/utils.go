@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 )
 
 const (
@@ -13,6 +14,11 @@ const (
 	UserURL  = "/users/:id"
 	Register = "/register"
 	Auth     = "/auth"
+)
+
+const (
+	SigningKey  = "secret"
+	ExpDuration = time.Hour * 12
 )
 
 const (
