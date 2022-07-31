@@ -17,6 +17,11 @@ const (
 )
 
 const (
+	NotesURL = "/notes"
+	NoteURL  = "/notes/:id"
+)
+
+const (
 	SigningKey  = "secret"
 	ExpDuration = time.Hour * 12
 )

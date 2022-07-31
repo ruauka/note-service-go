@@ -19,14 +19,20 @@ type UserService interface {
 	DeleteUser(id string) (int, error)
 }
 
+type NoteService interface {
+	CreateNote(note *model.Note) (*model.Note, error)
+}
+
 type Services struct {
 	Auth UserAuthService
 	User UserService
+	Note NoteService
 }
 
 func NewServices(db *storage.Storages) *Services {
 	return &Services{
 		Auth: NewAuthService(db.Auth),
 		User: NewUserService(db.User),
+		Note: NewNoteService(db.Note),
 	}
 }

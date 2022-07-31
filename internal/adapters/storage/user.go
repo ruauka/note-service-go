@@ -32,8 +32,8 @@ func (u *userStorage) GetUserByID(id string) (*dto.UserResp, error) {
 func (u *userStorage) GetAllUsers() ([]dto.UserResp, error) {
 	var users []dto.UserResp
 
-	getAllUsersQuery := fmt.Sprintf("SELECT id, username FROM %s", utils.UsersTable)
-	if err := u.db.Select(&users, getAllUsersQuery); err != nil {
+	query := fmt.Sprintf("SELECT id, username FROM %s", utils.UsersTable)
+	if err := u.db.Select(&users, query); err != nil {
 		return nil, err
 	}
 

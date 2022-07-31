@@ -10,7 +10,7 @@ import (
 	"web/internal/utils"
 )
 
-func (h *handler) Identity(fn httprouter.Handle) httprouter.Handle {
+func (h *handler) CheckToken(fn httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		header := r.Header.Get("Authorization")
 		if header == "" {

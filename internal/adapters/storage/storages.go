@@ -19,14 +19,20 @@ type UserStorage interface {
 	DeleteUser(id string) (int, error)
 }
 
+type NoteStorage interface {
+	CreateNote(note *model.Note) (*model.Note, error)
+}
+
 type Storages struct {
 	Auth UserAuthStorage
 	User UserStorage
+	Note NoteStorage
 }
 
 func NewStorages(pgDB *sqlx.DB) *Storages {
 	return &Storages{
 		Auth: NewAuthStorage(pgDB),
 		User: NewUserStorage(pgDB),
+		Note: NewNoteStorage(pgDB),
 	}
 }

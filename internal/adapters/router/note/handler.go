@@ -1,4 +1,4 @@
-package user
+package note
 
 import (
 	"github.com/julienschmidt/httprouter"
@@ -21,10 +21,9 @@ func NewHandler(service *services.Services) *handler {
 func Register(router *httprouter.Router, service *services.Services) {
 	h := NewHandler(service)
 
-	router.POST(utils.Register, h.RegisterUser)
-	router.POST(utils.Auth, h.GenerateToken)
-	router.GET(utils.UsersURL, h.CheckToken(h.GetAllUsers))
-	router.GET(utils.UserURL, h.GetUserByID)
-	router.PUT(utils.UserURL, h.UpdateUser)
-	router.DELETE(utils.UserURL, h.DeleteUser)
+	//router.GET(utils.NotesURL, h.CheckToken)
+	//router.GET(utils.UserURL, h.GetUserByID)
+	router.POST(utils.NotesURL, h.CreateNote)
+	//router.PUT(utils.UserURL, h.UpdateUser)
+	//router.DELETE(utils.UserURL, h.DeleteUser)
 }

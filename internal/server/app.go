@@ -14,6 +14,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 
+	"web/internal/adapters/router/note"
 	"web/internal/adapters/router/user"
 	"web/internal/adapters/storage"
 	"web/internal/config"
@@ -33,7 +34,9 @@ func Execute() {
 	service := services.NewServices(pgDB)
 
 	router := httprouter.New()
+
 	user.Register(router, service)
+	note.Register(router, service)
 
 	srv := NewServer(cfg.App.Port, router)
 
