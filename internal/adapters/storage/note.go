@@ -18,8 +18,8 @@ func NewNoteStorage(pgDB *sqlx.DB) NoteStorage {
 }
 
 func (n *noteStorage) CreateNote(note *model.Note, userID string) (*model.Note, error) {
-	query := fmt.Sprintf("INSERT INTO %s (note, user_id) VALUES ($1, $2) RETURNING id", utils.NotesTable)
-	if err := n.db.QueryRow(query, note.Note, userID).Scan(&note.ID); err != nil {
+	query := fmt.Sprintf("INSERT INTO %s (title, info, user_id) VALUES ($1, $2, $3) RETURNING id", utils.NotesTable)
+	if err := n.db.QueryRow(query, note.Title, note.Info, userID).Scan(&note.ID); err != nil {
 		return nil, err
 	}
 

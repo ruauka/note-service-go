@@ -28,7 +28,7 @@ func (h *handler) CreateNote(w http.ResponseWriter, r *http.Request, _ httproute
 	}
 
 	resp := make(map[string]string)
-	resp[fmt.Sprintf("Создана заметка '%s' с id", note.Note)] = note.ID
+	resp[fmt.Sprintf("Создана заметка '%s' с id", note.Title)] = note.ID
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
