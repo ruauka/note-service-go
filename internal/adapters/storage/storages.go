@@ -3,18 +3,30 @@ package storage
 import (
 	"github.com/jmoiron/sqlx"
 
-	user2 "web/internal/adapters/storage/user"
-	"web/internal/domain/interfaces"
+	"web/internal/domain/enteties/dto"
+	"web/internal/domain/enteties/model"
 )
 
+type UserAuthStorage interface {
+	RegisterUser(user *model.User) (*model.User, error)
+	GetUserForToken(userName, password string) (*model.User, error)
+}
+
+type UserStorage interface {
+	GetAllUsers() ([]dto.UserResp, error)
+	GetUserByID(id string) (*dto.UserResp, error)
+	UpdateUser(newUser *dto.UserUpdate, userId string) error
+	DeleteUser(id string) (int, error)
+}
+
 type Storages struct {
-	Auth interfaces.UserAuthStorage
-	User interfaces.UserStorage
+	Auth UserAuthStorage
+	User UserStorage
 }
 
 func NewStorages(pgDB *sqlx.DB) *Storages {
 	return &Storages{
-		Auth: user2.NewAuthStorage(pgDB),
-		User: user2.NewUserStorage(pgDB),
+		Auth: NewAuthStorage(pgDB),
+		User: NewUserStorage(pgDB),
 	}
 }

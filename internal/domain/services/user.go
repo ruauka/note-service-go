@@ -1,17 +1,17 @@
-package user
+package services
 
 import (
+	"web/internal/adapters/storage"
 	"web/internal/domain/enteties/dto"
 	"web/internal/domain/errors"
-	"web/internal/domain/interfaces"
 )
 
 type userService struct {
-	storage interfaces.UserStorage
+	storage storage.UserStorage
 	// logger
 }
 
-func NewUserService(db interfaces.UserStorage) interfaces.UserService {
+func NewUserService(db storage.UserStorage) UserService {
 	return &userService{storage: db}
 }
 

@@ -1,4 +1,4 @@
-package user
+package storage
 
 import (
 	"fmt"
@@ -6,7 +6,6 @@ import (
 	"github.com/jmoiron/sqlx"
 
 	"web/internal/domain/enteties/model"
-	"web/internal/domain/interfaces"
 	"web/internal/utils"
 )
 
@@ -14,7 +13,7 @@ type userAuthStorage struct {
 	db *sqlx.DB
 }
 
-func NewAuthStorage(pgDB *sqlx.DB) interfaces.UserAuthStorage {
+func NewAuthStorage(pgDB *sqlx.DB) UserAuthStorage {
 	return &userAuthStorage{db: pgDB}
 }
 

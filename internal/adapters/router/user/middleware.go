@@ -26,7 +26,7 @@ func (h *handler) Identity(fn httprouter.Handle) httprouter.Handle {
 
 		userId, err := h.service.Auth.ParseToken(headerParts[1])
 		if err != nil {
-			utils.Abort(w, http.StatusUnauthorized, err, err) //////////////
+			utils.Abort(w, http.StatusUnauthorized, nil, err)
 			return
 		}
 

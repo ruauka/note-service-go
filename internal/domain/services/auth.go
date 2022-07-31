@@ -1,4 +1,4 @@
-package user
+package services
 
 import (
 	"errors"
@@ -7,18 +7,18 @@ import (
 
 	"github.com/golang-jwt/jwt"
 
+	"web/internal/adapters/storage"
 	"web/internal/domain/enteties/dto"
 	"web/internal/domain/enteties/model"
-	"web/internal/domain/interfaces"
 	"web/internal/utils"
 )
 
 type authService struct {
-	storage interfaces.UserAuthStorage
+	storage storage.UserAuthStorage
 	// logger
 }
 
-func NewAuthService(db interfaces.UserAuthStorage) interfaces.UserAuthService {
+func NewAuthService(db storage.UserAuthStorage) UserAuthService {
 	return &authService{storage: db}
 }
 
