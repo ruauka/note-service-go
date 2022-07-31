@@ -22,9 +22,9 @@ func NewHandler(service *services.Services) *handler {
 func Register(router *httprouter.Router, service *services.Services) {
 	h := NewHandler(service)
 
-	//router.GET(utils.NotesURL, h.CheckToken)
-	//router.GET(utils.UserURL, h.GetUserByID)
+	router.GET(utils.NoteURL, middleware.CheckToken(h.GetNoteByID, h.service.Auth))
+	router.GET(utils.NotesURL, middleware.CheckToken(h.GetAllNotesByUser, h.service.Auth))
 	router.POST(utils.NotesURL, middleware.CheckToken(h.CreateNote, h.service.Auth))
 	//router.PUT(utils.UserURL, h.UpdateUser)
-	//router.DELETE(utils.UserURL, h.DeleteUser)
+	router.DELETE(utils.NoteURL, middleware.CheckToken(h.DeleteNote, h.service.Auth))
 }

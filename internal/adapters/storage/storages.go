@@ -21,6 +21,10 @@ type UserStorage interface {
 
 type NoteStorage interface {
 	CreateNote(note *model.Note, userID string) (*model.Note, error)
+	GetNoteByID(id string, userID string) (*dto.NoteResp, error)
+	GetAllNotesByUser(userID string) ([]dto.NoteResp, error)
+
+	DeleteNote(noteID, userID string) (int, error)
 }
 
 type Storages struct {
