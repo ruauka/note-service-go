@@ -10,10 +10,6 @@ import (
 	"web/internal/utils"
 )
 
-//const (
-//	UsersTable = "users"
-//)
-
 type userStorage struct {
 	db *sqlx.DB
 }

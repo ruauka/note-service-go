@@ -1,16 +1,13 @@
-CREATE TABLE "user"
+CREATE TABLE users
 (
-    "id"       serial PRIMARY KEY,
-    "username" varchar UNIQUE NOT NULL,
-    "password" varchar        NOT NULL
+    id       serial PRIMARY KEY,
+    username varchar(255) UNIQUE NOT NULL,
+    password varchar(255)        NOT NULL
 );
 
-CREATE TABLE "note"
+CREATE TABLE notes
 (
-    "id"        SERIAL PRIMARY KEY,
-    "note"      text,
-    "author_id" int NOT NULL
+    id        SERIAL PRIMARY KEY,
+    note      text,
+    author_id int references users (id) on DELETE CASCADE NOT NULL
 );
-
-ALTER TABLE "note"
-    ADD FOREIGN KEY ("author_id") REFERENCES "user" ("id");

@@ -19,6 +19,7 @@ func NewAuthStorage(pgDB *sqlx.DB) UserAuthStorage {
 
 func (s *userAuthStorage) RegisterUser(user *model.User) (*model.User, error) {
 	query := fmt.Sprintf("INSERT INTO %s (username, password) VALUES ($1, $2) RETURNING id", utils.UsersTable)
+	
 	if err := s.db.QueryRow(query, user.Username, user.Password).Scan(&user.ID); err != nil {
 		return nil, err
 	}
