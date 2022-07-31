@@ -19,7 +19,9 @@ func (h *handler) CreateNote(w http.ResponseWriter, r *http.Request, _ httproute
 		return
 	}
 
-	note, err := h.service.Note.CreateNote(note)
+	userID := r.Header.Get("user_id")
+
+	note, err := h.service.Note.CreateNote(note, userID)
 	if err != nil {
 		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
 		return

@@ -20,7 +20,7 @@ type UserStorage interface {
 }
 
 type NoteStorage interface {
-	CreateNote(note *model.Note) (*model.Note, error)
+	CreateNote(note *model.Note, userID string) (*model.Note, error)
 }
 
 type Storages struct {

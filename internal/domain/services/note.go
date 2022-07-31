@@ -14,6 +14,6 @@ func NewNoteService(db storage.NoteStorage) NoteService {
 	return &noteService{storage: db}
 }
 
-func (n *noteService) CreateNote(note *model.Note) (*model.Note, error) {
-	return n.storage.CreateNote(note)
+func (n *noteService) CreateNote(note *model.Note, userID string) (*model.Note, error) {
+	return n.storage.CreateNote(note, userID)
 }

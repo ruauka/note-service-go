@@ -28,6 +28,7 @@ const (
 
 const (
 	UsersTable = "users"
+	NotesTable = "notes"
 )
 
 const salt = "abc"

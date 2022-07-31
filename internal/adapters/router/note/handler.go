@@ -3,6 +3,7 @@ package note
 import (
 	"github.com/julienschmidt/httprouter"
 
+	"web/internal/adapters/router/middleware"
 	"web/internal/domain/services"
 	"web/internal/utils"
 )
@@ -23,7 +24,7 @@ func Register(router *httprouter.Router, service *services.Services) {
 
 	//router.GET(utils.NotesURL, h.CheckToken)
 	//router.GET(utils.UserURL, h.GetUserByID)
-	router.POST(utils.NotesURL, h.CreateNote)
+	router.POST(utils.NotesURL, middleware.CheckToken(h.CreateNote, h.service.Auth))
 	//router.PUT(utils.UserURL, h.UpdateUser)
 	//router.DELETE(utils.UserURL, h.DeleteUser)
 }

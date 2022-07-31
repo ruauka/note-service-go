@@ -56,9 +56,6 @@ func (h *handler) GenerateToken(w http.ResponseWriter, r *http.Request, _ httpro
 }
 
 func (h *handler) GetAllUsers(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-
-	fmt.Printf("user_id: %s\n", r.Header.Get("user_id"))
-
 	users, err := h.service.User.GetAllUsers()
 	if err != nil {
 		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)

@@ -20,7 +20,7 @@ type UserService interface {
 }
 
 type NoteService interface {
-	CreateNote(note *model.Note) (*model.Note, error)
+	CreateNote(note *model.Note, userID string) (*model.Note, error)
 }
 
 type Services struct {

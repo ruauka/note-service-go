@@ -1,4 +1,4 @@
-package user
+package middleware
 
 import (
 	"net/http"
@@ -7,10 +7,11 @@ import (
 	"github.com/julienschmidt/httprouter"
 
 	"web/internal/domain/errors"
+	"web/internal/domain/services"
 	"web/internal/utils"
 )
 
-func (h *handler) CheckToken(fn httprouter.Handle) httprouter.Handle {
+func CheckToken(fn httprouter.Handle, auth services.UserAuthService) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		header := r.Header.Get("Authorization")
 		if header == "" {
@@ -24,7 +25,7 @@ func (h *handler) CheckToken(fn httprouter.Handle) httprouter.Handle {
 			return
 		}
 
-		userId, err := h.service.Auth.ParseToken(headerParts[1])
+		userId, err := auth.ParseToken(headerParts[1])
 		if err != nil {
 			utils.Abort(w, http.StatusUnauthorized, nil, err)
 			return

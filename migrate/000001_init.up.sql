@@ -7,7 +7,7 @@ CREATE TABLE users
 
 CREATE TABLE notes
 (
-    id        SERIAL PRIMARY KEY,
-    note      text,
-    author_id int references users (id) on DELETE CASCADE NOT NULL
+    id        serial PRIMARY KEY,
+    note      text NOT NULL ,
+    user_id integer REFERENCES users (id) ON DELETE CASCADE NOT NULL
 );
