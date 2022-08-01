@@ -3,7 +3,6 @@ package services
 import (
 	"web/internal/adapters/storage"
 	"web/internal/domain/enteties/dto"
-	"web/internal/domain/errors"
 )
 
 type userService struct {
@@ -16,11 +15,7 @@ func NewUserService(db storage.UserStorage) UserService {
 }
 
 func (u *userService) GetAllUsers() ([]dto.UserResp, error) {
-	users, err := u.storage.GetAllUsers()
-	if len(users) == 0 {
-		return nil, errors.ErrUsersListEmpty
-	}
-	return users, err
+	return u.storage.GetAllUsers()
 }
 
 func (u *userService) GetUserByID(id string) (*dto.UserResp, error) {

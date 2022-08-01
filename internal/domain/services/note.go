@@ -4,7 +4,6 @@ import (
 	"web/internal/adapters/storage"
 	"web/internal/domain/enteties/dto"
 	"web/internal/domain/enteties/model"
-	"web/internal/domain/errors"
 )
 
 type noteService struct {
@@ -25,11 +24,7 @@ func (n *noteService) GetNoteByID(noteID, userID string) (*dto.NoteResp, error) 
 }
 
 func (n *noteService) GetAllNotesByUser(userID string) ([]dto.NotesResp, error) {
-	notes, err := n.storage.GetAllNotesByUser(userID)
-	if len(notes) == 0 {
-		return nil, errors.ErrNotesListEmpty
-	}
-	return notes, err
+	return n.storage.GetAllNotesByUser(userID)
 }
 
 func (n *noteService) UpdateNote(newNote *dto.NoteUpdate, noteID string) error {

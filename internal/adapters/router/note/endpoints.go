@@ -22,6 +22,11 @@ func (h *handler) GetAllNotesByUser(w http.ResponseWriter, r *http.Request, _ ht
 		return
 	}
 
+	if len(notes) == 0 {
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrNotesListEmpty)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(notes)

@@ -62,6 +62,11 @@ func (h *handler) GetAllUsers(w http.ResponseWriter, r *http.Request, _ httprout
 		return
 	}
 
+	if len(users) == 0 {
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrUsersListEmpty)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(users)
@@ -88,7 +93,7 @@ func (h *handler) UpdateUser(w http.ResponseWriter, r *http.Request, ps httprout
 
 	_, err := h.service.User.GetUserByID(ps.ByName("id"))
 	if err != nil {
-		utils.Abort(w, http.StatusBadRequest, err, errors.ErrUserNotExists)
+		utils.Abort(w, http.StatusBadRequest, nil, errors.ErrUserNotExists)
 		return
 	}
 
@@ -107,6 +112,12 @@ func (h *handler) UpdateUser(w http.ResponseWriter, r *http.Request, ps httprout
 }
 
 func (h *handler) DeleteUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	_, err := h.service.User.GetUserByID(ps.ByName("id"))
+	if err != nil {
+		utils.Abort(w, http.StatusBadRequest, nil, errors.ErrUserNotExists)
+		return
+	}
+
 	id, err := h.service.User.DeleteUser(ps.ByName("id"))
 	if err != nil {
 		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
