@@ -27,10 +27,19 @@ type NoteStorage interface {
 	DeleteNote(noteID, userID string) (int, error)
 }
 
+type TagStorage interface {
+	CreateTag(tag *model.Tag, userID string) (*model.Tag, error)
+	GetTagByID(tagID, userID string) (*dto.TagResp, error)
+	GetAllTagsByUser(userID string) ([]dto.TagsResp, error)
+	UpdateTag(tag *dto.TagUpdate, tagID string) error
+	DeleteTag(tagID, userID string) (int, error)
+}
+
 type Storages struct {
 	Auth UserAuthStorage
 	User UserStorage
 	Note NoteStorage
+	Tag  TagStorage
 }
 
 func NewStorages(pgDB *sqlx.DB) *Storages {
@@ -38,5 +47,6 @@ func NewStorages(pgDB *sqlx.DB) *Storages {
 		Auth: NewAuthStorage(pgDB),
 		User: NewUserStorage(pgDB),
 		Note: NewNoteStorage(pgDB),
+		Tag:  NewTagStorage(pgDB),
 	}
 }

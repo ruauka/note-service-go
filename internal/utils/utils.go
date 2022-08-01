@@ -22,6 +22,11 @@ const (
 )
 
 const (
+	TagsURL = "/tags"
+	TagURL  = "/tags/:id"
+)
+
+const (
 	SigningKey  = "secret"
 	ExpDuration = time.Hour * 12
 )
@@ -29,6 +34,7 @@ const (
 const (
 	UsersTable = "users"
 	NotesTable = "notes"
+	TagsTable  = "tags"
 )
 
 const salt = "abc"

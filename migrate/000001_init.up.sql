@@ -8,7 +8,14 @@ CREATE TABLE users
 CREATE TABLE notes
 (
     id      serial PRIMARY KEY,
-    title   varchar(255) NOT NULL,
+    title   varchar(255)                                    NOT NULL,
     info    text,
+    user_id integer REFERENCES users (id) ON DELETE CASCADE NOT NULL
+);
+
+CREATE TABLE tags
+(
+    id      serial PRIMARY KEY,
+    tagname varchar(255) UNIQUE                             NOT NULL,
     user_id integer REFERENCES users (id) ON DELETE CASCADE NOT NULL
 );

@@ -17,3 +17,8 @@ var (
 	ErrNotesListEmpty = errors.New("no notes")
 	ErrNoteNotExists  = errors.New("note not exists")
 )
+
+var (
+	ErrTagsListEmpty = errors.New("no tags")
+	ErrTagNotExists  = errors.New("tag not exists")
+)

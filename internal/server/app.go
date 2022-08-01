@@ -15,6 +15,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 
 	"web/internal/adapters/router/note"
+	"web/internal/adapters/router/tag"
 	"web/internal/adapters/router/user"
 	"web/internal/adapters/storage"
 	"web/internal/config"
@@ -37,11 +38,12 @@ func Execute() {
 
 	user.Register(router, service)
 	note.Register(router, service)
+	tag.Register(router, service)
 
 	srv := NewServer(cfg.App.Port, router)
 
 	go func() {
-		if err := srv.Start(); !errors.Is(err, http.ErrServerClosed) && err != nil {
+		if err := srv.Start(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Printf("error occurred while running http server: %s\n", err.Error())
 		}
 	}()

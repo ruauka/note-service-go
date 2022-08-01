@@ -1,2 +1,3 @@
+DROP TABLE tags;
 DROP TABLE notes;
 DROP TABLE users;
