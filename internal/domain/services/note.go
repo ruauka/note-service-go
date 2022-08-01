@@ -24,12 +24,16 @@ func (n *noteService) GetNoteByID(noteID, userID string) (*dto.NoteResp, error) 
 	return n.storage.GetNoteByID(noteID, userID)
 }
 
-func (n *noteService) GetAllNotesByUser(userID string) ([]dto.NoteResp, error) {
+func (n *noteService) GetAllNotesByUser(userID string) ([]dto.NotesResp, error) {
 	notes, err := n.storage.GetAllNotesByUser(userID)
 	if len(notes) == 0 {
 		return nil, errors.ErrNotesListEmpty
 	}
 	return notes, err
+}
+
+func (n *noteService) UpdateNote(newNote *dto.NoteUpdate, noteID string) error {
+	return n.storage.UpdateNote(newNote, noteID)
 }
 
 func (n *noteService) DeleteNote(noteID, userID string) (int, error) {

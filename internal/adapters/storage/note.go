@@ -2,6 +2,7 @@ package storage
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/jmoiron/sqlx"
 
@@ -38,15 +39,40 @@ func (n *noteStorage) GetNoteByID(id string, userID string) (*dto.NoteResp, erro
 	return &note, nil
 }
 
-func (n *noteStorage) GetAllNotesByUser(userID string) ([]dto.NoteResp, error) {
-	var notes []dto.NoteResp
+func (n *noteStorage) GetAllNotesByUser(userID string) ([]dto.NotesResp, error) {
+	var notes []dto.NotesResp
 
-	query := fmt.Sprintf("SELECT title, info FROM %s WHERE user_id=$1", utils.NotesTable)
+	query := fmt.Sprintf("SELECT id, title, info FROM %s WHERE user_id=$1", utils.NotesTable)
 	if err := n.db.Select(&notes, query, userID); err != nil {
 		return nil, err
 	}
 
 	return notes, nil
+}
+
+func (n *noteStorage) UpdateNote(newNote *dto.NoteUpdate, noteID string) error {
+	setValues := make([]string, 0)
+	args := make([]interface{}, 0)
+	argId := 1
+
+	if newNote.Info != nil {
+		setValues = append(setValues, fmt.Sprintf("info=$%d", argId))
+		args = append(args, *newNote.Info)
+		argId++
+	}
+
+	if newNote.Title != nil {
+		setValues = append(setValues, fmt.Sprintf("title=$%d", argId))
+		args = append(args, *newNote.Title)
+		argId++
+	}
+
+	setQuery := strings.Join(setValues, ", ")
+	query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d", utils.NotesTable, setQuery, argId)
+	args = append(args, noteID)
+
+	_, err := n.db.Exec(query, args...)
+	return err
 }
 
 func (n *noteStorage) DeleteNote(noteID, userID string) (int, error) {

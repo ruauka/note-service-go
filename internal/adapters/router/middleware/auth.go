@@ -11,7 +11,7 @@ import (
 	"web/internal/utils"
 )
 
-func CheckToken(fn httprouter.Handle, auth services.UserAuthService) httprouter.Handle {
+func CheckToken(next httprouter.Handle, auth services.UserAuthService) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		header := r.Header.Get("Authorization")
 		if header == "" {
@@ -33,6 +33,6 @@ func CheckToken(fn httprouter.Handle, auth services.UserAuthService) httprouter.
 
 		r.Header.Set("user_id", userId)
 
-		fn(w, r, ps)
+		next(w, r, ps)
 	}
 }

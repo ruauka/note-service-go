@@ -22,8 +22,8 @@ type UserService interface {
 type NoteService interface {
 	CreateNote(note *model.Note, userID string) (*model.Note, error)
 	GetNoteByID(noteID, userID string) (*dto.NoteResp, error)
-	GetAllNotesByUser(userID string) ([]dto.NoteResp, error)
-
+	GetAllNotesByUser(userID string) ([]dto.NotesResp, error)
+	UpdateNote(newNote *dto.NoteUpdate, noteID string) error
 	DeleteNote(noteID, userID string) (int, error)
 }
 

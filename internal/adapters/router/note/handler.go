@@ -25,6 +25,6 @@ func Register(router *httprouter.Router, service *services.Services) {
 	router.GET(utils.NoteURL, middleware.CheckToken(h.GetNoteByID, h.service.Auth))
 	router.GET(utils.NotesURL, middleware.CheckToken(h.GetAllNotesByUser, h.service.Auth))
 	router.POST(utils.NotesURL, middleware.CheckToken(h.CreateNote, h.service.Auth))
-	//router.PUT(utils.UserURL, h.UpdateUser)
+	router.PUT(utils.NoteURL, middleware.CheckToken(h.UpdateNote, h.service.Auth))
 	router.DELETE(utils.NoteURL, middleware.CheckToken(h.DeleteNote, h.service.Auth))
 }

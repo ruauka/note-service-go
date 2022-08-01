@@ -9,4 +9,5 @@ var (
 	ErrEmptyAuthHeader   = errors.New("empty auth header")
 	ErrInvalidAuthHeader = errors.New("invalid auth header")
 	ErrNotesListEmpty    = errors.New("no users")
+	ErrNoteNotExists     = errors.New("note not exists")
 )
