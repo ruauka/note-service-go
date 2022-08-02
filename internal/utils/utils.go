@@ -27,14 +27,20 @@ const (
 )
 
 const (
+	TagsSet    = "/notes/:id/tags/set"
+	TagsRemove = "/notes/:note_id/tags/remove"
+)
+
+const (
 	SigningKey  = "secret"
 	ExpDuration = time.Hour * 12
 )
 
 const (
-	UsersTable = "users"
-	NotesTable = "notes"
-	TagsTable  = "tags"
+	UsersTable     = "users"
+	NotesTable     = "notes"
+	TagsTable      = "tags"
+	NotesTagsTable = "notes_tags"
 )
 
 const salt = "abc"

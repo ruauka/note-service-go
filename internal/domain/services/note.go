@@ -34,3 +34,7 @@ func (n *noteService) UpdateNote(newNote *dto.NoteUpdate, noteID string) error {
 func (n *noteService) DeleteNote(noteID, userID string) (int, error) {
 	return n.storage.DeleteNote(noteID, userID)
 }
+
+func (n *noteService) SetTags(noteID, userID string, tags []string) error {
+	return n.storage.SetTags(noteID, userID, tags)
+}

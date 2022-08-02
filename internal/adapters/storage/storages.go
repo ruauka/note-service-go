@@ -25,6 +25,7 @@ type NoteStorage interface {
 	GetAllNotesByUser(userID string) ([]dto.NotesResp, error)
 	UpdateNote(newNote *dto.NoteUpdate, noteID string) error
 	DeleteNote(noteID, userID string) (int, error)
+	SetTags(noteID, userID string, tags []string) error
 }
 
 type TagStorage interface {

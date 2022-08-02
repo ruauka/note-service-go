@@ -27,4 +27,6 @@ func Register(router *httprouter.Router, service *services.Services) {
 	router.POST(utils.NotesURL, middleware.CheckToken(h.CreateNote, h.service.Auth))
 	router.PUT(utils.NoteURL, middleware.CheckToken(h.UpdateNote, h.service.Auth))
 	router.DELETE(utils.NoteURL, middleware.CheckToken(h.DeleteNote, h.service.Auth))
+
+	router.PUT(utils.TagsSet, middleware.CheckToken(h.SetTags, h.service.Auth))
 }

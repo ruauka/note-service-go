@@ -19,3 +19,11 @@ CREATE TABLE tags
     tagname varchar(255) UNIQUE                             NOT NULL,
     user_id integer REFERENCES users (id) ON DELETE CASCADE NOT NULL
 );
+
+CREATE TABLE notes_tags
+(
+    note_id integer REFERENCES notes (id),
+    tag_id  integer REFERENCES tags (id),
+
+    CONSTRAINT notes_tags_pkey PRIMARY KEY (note_id, tag_id)
+);
