@@ -138,7 +138,7 @@ func (h *handler) SetTags(w http.ResponseWriter, r *http.Request, ps httprouter.
 		tagsIDs = append(tagsIDs, id[0])
 	}
 
-	if err := h.service.Note.SetTags(noteID, userID, tagsIDs); err != nil {
+	if err := h.service.Note.SetTags(noteID, tagsIDs); err != nil {
 		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
 		return
 	}
@@ -150,6 +150,46 @@ func (h *handler) SetTags(w http.ResponseWriter, r *http.Request, ps httprouter.
 
 	resp := make(map[string]map[string]string)
 	resp[fmt.Sprintf("К заметке '%s' добавлены тэги", note.Title)] = tagResp
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(resp)
+}
+
+func (h *handler) RemoveTags(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	userID := r.Header.Get("user_id")
+	noteID := ps.ByName("id")
+	tags := r.URL.Query()
+
+	note, err := h.service.Note.GetNoteByID(noteID, userID)
+	if err != nil {
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		return
+	}
+
+	tagsIDs := make([]string, 0, len(tags))
+
+	for _, id := range tags {
+		_, err := h.service.Tag.GetTagByID(id[0], userID)
+		if err != nil {
+			utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+			return
+		}
+		tagsIDs = append(tagsIDs, id[0])
+	}
+
+	if err := h.service.Note.RemoveTags(noteID, tagsIDs); err != nil {
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		return
+	}
+
+	tagResp := make(map[string]string)
+	for tag, id := range tags {
+		tagResp[tag] = id[0]
+	}
+
+	resp := make(map[string]map[string]string)
+	resp[fmt.Sprintf("У заметки '%s' удалены тэги", note.Title)] = tagResp
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

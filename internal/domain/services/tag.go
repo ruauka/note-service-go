@@ -11,8 +11,8 @@ type tagService struct {
 	// logger
 }
 
-func NewTagService(db storage.TagStorage) TagService {
-	return &tagService{storage: db}
+func NewTagService(tagStorage storage.TagStorage) TagService {
+	return &tagService{storage: tagStorage}
 }
 
 func (t *tagService) CreateTag(tag *model.Tag, userID string) (*model.Tag, error) {

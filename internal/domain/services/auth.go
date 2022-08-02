@@ -18,8 +18,8 @@ type authService struct {
 	// logger
 }
 
-func NewAuthService(db storage.UserAuthStorage) UserAuthService {
-	return &authService{storage: db}
+func NewAuthService(userAuthStorage storage.UserAuthStorage) UserAuthService {
+	return &authService{storage: userAuthStorage}
 }
 
 func (a *authService) RegisterUser(user *model.User) (*model.User, error) {

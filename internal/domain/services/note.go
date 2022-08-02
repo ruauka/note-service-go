@@ -11,8 +11,8 @@ type noteService struct {
 	// logger
 }
 
-func NewNoteService(db storage.NoteStorage) NoteService {
-	return &noteService{storage: db}
+func NewNoteService(noteStorage storage.NoteStorage) NoteService {
+	return &noteService{storage: noteStorage}
 }
 
 func (n *noteService) CreateNote(note *model.Note, userID string) (*model.Note, error) {
@@ -35,6 +35,10 @@ func (n *noteService) DeleteNote(noteID, userID string) (int, error) {
 	return n.storage.DeleteNote(noteID, userID)
 }
 
-func (n *noteService) SetTags(noteID, userID string, tags []string) error {
-	return n.storage.SetTags(noteID, userID, tags)
+func (n *noteService) SetTags(noteID string, tags []string) error {
+	return n.storage.SetTags(noteID, tags)
+}
+
+func (n *noteService) RemoveTags(noteID string, tags []string) error {
+	return n.storage.RemoveTags(noteID, tags)
 }

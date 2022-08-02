@@ -10,8 +10,8 @@ type userService struct {
 	// logger
 }
 
-func NewUserService(db storage.UserStorage) UserService {
-	return &userService{storage: db}
+func NewUserService(userStorage storage.UserStorage) UserService {
+	return &userService{storage: userStorage}
 }
 
 func (u *userService) GetAllUsers() ([]dto.UserResp, error) {

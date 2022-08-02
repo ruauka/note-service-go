@@ -86,9 +86,20 @@ func (n *noteStorage) DeleteNote(noteID, userID string) (int, error) {
 	return id, nil
 }
 
-func (n *noteStorage) SetTags(noteID, userID string, tags []string) error {
+func (n *noteStorage) SetTags(noteID string, tags []string) error {
 	for _, tagID := range tags {
 		query := fmt.Sprintf("INSERT INTO %s (note_id, tag_id) VALUES ($1, $2)", utils.NotesTagsTable)
+		if res := n.db.QueryRow(query, noteID, tagID); res.Err() != nil {
+			return res.Err()
+		}
+	}
+
+	return nil
+}
+
+func (n *noteStorage) RemoveTags(noteID string, tags []string) error {
+	for _, tagID := range tags {
+		query := fmt.Sprintf("DELETE FROM %s WHERE note_id=$1 AND tag_id=$2", utils.NotesTagsTable)
 		if res := n.db.QueryRow(query, noteID, tagID); res.Err() != nil {
 			return res.Err()
 		}

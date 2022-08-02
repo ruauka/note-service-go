@@ -28,7 +28,7 @@ const (
 
 const (
 	TagsSet    = "/notes/:id/tags/set"
-	TagsRemove = "/notes/:note_id/tags/remove"
+	TagsRemove = "/notes/:id/tags/remove"
 )
 
 const (

@@ -25,7 +25,8 @@ type NoteService interface {
 	GetAllNotesByUser(userID string) ([]dto.NotesResp, error)
 	UpdateNote(newNote *dto.NoteUpdate, noteID string) error
 	DeleteNote(noteID, userID string) (int, error)
-	SetTags(noteID, userID string, tags []string) error
+	SetTags(noteID string, tags []string) error
+	RemoveTags(noteID string, tags []string) error
 }
 
 type TagService interface {
@@ -43,11 +44,11 @@ type Services struct {
 	Tag  TagService
 }
 
-func NewServices(db *storage.Storages) *Services {
+func NewServices(storages *storage.Storages) *Services {
 	return &Services{
-		Auth: NewAuthService(db.Auth),
-		User: NewUserService(db.User),
-		Note: NewNoteService(db.Note),
-		Tag:  NewTagService(db.Tag),
+		Auth: NewAuthService(storages.Auth),
+		User: NewUserService(storages.User),
+		Note: NewNoteService(storages.Note),
+		Tag:  NewTagService(storages.Tag),
 	}
 }
