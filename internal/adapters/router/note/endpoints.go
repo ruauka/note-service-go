@@ -92,7 +92,7 @@ func (h *handler) UpdateNote(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	resp := make(map[string]string)
-	resp["Обновлена заметка с id"] = ps.ByName("id")
+	resp["Обновлена заметка с id"] = noteID
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -194,4 +194,29 @@ func (h *handler) RemoveTags(w http.ResponseWriter, r *http.Request, ps httprout
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(resp)
+}
+
+func (h *handler) GetAllNotesWithTags(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	userID := r.Header.Get("user_id")
+
+	notes, err := h.service.Note.GetAllNotesByUser(userID)
+	if err != nil {
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		return
+	}
+
+	if len(notes) == 0 {
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrNotesListEmpty)
+		return
+	}
+
+	tempNotes, err := h.service.Note.GetAllNotesWithTags(userID, notes)
+	if err != nil {
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(tempNotes)
 }

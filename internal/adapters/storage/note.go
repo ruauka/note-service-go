@@ -2,6 +2,7 @@ package storage
 
 import (
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/jmoiron/sqlx"
@@ -72,6 +73,7 @@ func (n *noteStorage) UpdateNote(newNote *dto.NoteUpdate, noteID string) error {
 	args = append(args, noteID)
 
 	_, err := n.db.Exec(query, args...)
+
 	return err
 }
 
@@ -106,4 +108,37 @@ func (n *noteStorage) RemoveTags(noteID string, tags []string) error {
 	}
 
 	return nil
+}
+
+func (n *noteStorage) GetAllNotesWithTags(userID string, notes []dto.NotesResp) ([]dto.NotesWithTagsResp, error) {
+	resultNotes := make([]dto.NotesWithTagsResp, len(notes), len(notes))
+
+	for index, note := range notes {
+		query := fmt.Sprintf("SELECT notes.id, notes.title, notes.info, tags.id, tags.tagname"+
+			" FROM %s JOIN notes_tags"+
+			" ON notes.id = notes_tags.note_id"+
+			" JOIN tags"+
+			" ON notes_tags.tag_id = tags.id"+
+			" AND tags.user_id = $1 AND notes.id = $2", utils.NotesTable)
+
+		row, err := n.db.Query(query, userID, note.ID)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		for row.Next() {
+			var note dto.NotesWithTags
+
+			if err := row.Scan(&note.ID, &note.Title, &note.Info, &note.TagsResp.ID, &note.TagsResp.TagName); err != nil {
+				log.Println(err)
+			}
+
+			resultNotes[index].ID = note.ID
+			resultNotes[index].Title = note.Title
+			resultNotes[index].Info = note.Info
+			resultNotes[index].TagsResp = append(resultNotes[index].TagsResp, note.TagsResp)
+		}
+	}
+
+	return resultNotes, nil
 }

@@ -42,3 +42,8 @@ func (n *noteService) SetTags(noteID string, tags []string) error {
 func (n *noteService) RemoveTags(noteID string, tags []string) error {
 	return n.storage.RemoveTags(noteID, tags)
 }
+
+func (n *noteService) GetAllNotesWithTags(userID string, notes []dto.NotesResp) ([]dto.NotesWithTagsResp, error) {
+	return n.storage.GetAllNotesWithTags(userID, notes)
+
+}

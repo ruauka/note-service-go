@@ -92,7 +92,7 @@ func (h *handler) UpdateTag(w http.ResponseWriter, r *http.Request, ps httproute
 	}
 
 	resp := make(map[string]string)
-	resp["Обновлен тэг с id"] = ps.ByName("id")
+	resp["Обновлен тэг с id"] = tagID
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

@@ -13,12 +13,13 @@ const (
 	UsersURL = "/users"
 	UserURL  = "/users/:id"
 	Register = "/register"
-	Auth     = "/auth"
+	Login    = "/login"
 )
 
 const (
-	NotesURL = "/notes"
-	NoteURL  = "/notes/:id"
+	NotesURL       = "/notes"
+	NoteURL        = "/notes/:id"
+	AllTagsByNotes = "/allnotes/tags"
 )
 
 const (

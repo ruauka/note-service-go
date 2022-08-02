@@ -22,7 +22,7 @@ func Register(router *httprouter.Router, service *services.Services) {
 	h := NewHandler(service)
 
 	router.POST(utils.Register, h.RegisterUser)
-	router.POST(utils.Auth, h.GenerateToken)
+	router.POST(utils.Login, h.GenerateToken)
 	router.GET(utils.UsersURL, h.GetAllUsers)
 	router.GET(utils.UserURL, h.GetUserByID)
 	router.PUT(utils.UserURL, h.UpdateUser)

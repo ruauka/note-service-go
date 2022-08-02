@@ -66,6 +66,7 @@ func (t *tagStorage) UpdateTag(tag *dto.TagUpdate, tagID string) error {
 	args = append(args, tagID)
 
 	_, err := t.db.Exec(query, args...)
+
 	return err
 }
 

@@ -16,7 +16,7 @@ CREATE TABLE notes
 CREATE TABLE tags
 (
     id      serial PRIMARY KEY,
-    tagname varchar(255) UNIQUE                             NOT NULL,
+    tagname varchar(255)                                    NOT NULL,
     user_id integer REFERENCES users (id) ON DELETE CASCADE NOT NULL
 );
 

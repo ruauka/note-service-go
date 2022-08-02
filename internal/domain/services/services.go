@@ -27,6 +27,7 @@ type NoteService interface {
 	DeleteNote(noteID, userID string) (int, error)
 	SetTags(noteID string, tags []string) error
 	RemoveTags(noteID string, tags []string) error
+	GetAllNotesWithTags(userID string, notes []dto.NotesResp) ([]dto.NotesWithTagsResp, error)
 }
 
 type TagService interface {

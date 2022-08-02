@@ -62,6 +62,7 @@ func (u *userStorage) UpdateUser(newUser *dto.UserUpdate, userId string) error {
 	args = append(args, userId)
 
 	_, err := u.db.Exec(query, args...)
+
 	return err
 }
 
