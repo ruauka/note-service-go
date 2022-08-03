@@ -22,8 +22,8 @@ CREATE TABLE tags
 
 CREATE TABLE notes_tags
 (
-    note_id integer REFERENCES notes (id),
-    tag_id  integer REFERENCES tags (id),
+    note_id integer REFERENCES notes (id) ON DELETE CASCADE,
+    tag_id  integer REFERENCES tags (id) ON DELETE CASCADE,
 
     CONSTRAINT notes_tags_pkey PRIMARY KEY (note_id, tag_id)
 );

@@ -18,12 +18,12 @@ func (h *handler) GetAllNotesByUser(w http.ResponseWriter, r *http.Request, _ ht
 
 	notes, err := h.service.Note.GetAllNotesByUser(userID)
 	if err != nil {
-		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
 		return
 	}
 
 	if len(notes) == 0 {
-		utils.Abort(w, http.StatusBadRequest, err, errors.ErrNotesListEmpty)
+		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrNotesListEmpty)
 		return
 	}
 
@@ -37,7 +37,7 @@ func (h *handler) GetNoteByID(w http.ResponseWriter, r *http.Request, ps httprou
 
 	note, err := h.service.Note.GetNoteByID(ps.ByName("id"), userID)
 	if err != nil {
-		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
 		return
 	}
 
@@ -57,7 +57,7 @@ func (h *handler) CreateNote(w http.ResponseWriter, r *http.Request, _ httproute
 
 	note, err := h.service.Note.CreateNote(note, userID)
 	if err != nil {
-		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
 		return
 	}
 
@@ -81,13 +81,13 @@ func (h *handler) UpdateNote(w http.ResponseWriter, r *http.Request, ps httprout
 
 	_, err := h.service.Note.GetNoteByID(noteID, userID)
 	if err != nil {
-		utils.Abort(w, http.StatusBadRequest, err, errors.ErrNoteNotExists)
+		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrNoteNotExists)
 		return
 	}
 
 	err = h.service.Note.UpdateNote(newNote, noteID)
 	if err != nil {
-		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
 		return
 	}
 
@@ -104,7 +104,7 @@ func (h *handler) DeleteNote(w http.ResponseWriter, r *http.Request, ps httprout
 
 	noteID, err := h.service.Note.DeleteNote(ps.ByName("id"), userID)
 	if err != nil {
-		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
 		return
 	}
 
@@ -123,7 +123,7 @@ func (h *handler) SetTags(w http.ResponseWriter, r *http.Request, ps httprouter.
 
 	note, err := h.service.Note.GetNoteByID(noteID, userID)
 	if err != nil {
-		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
 		return
 	}
 
@@ -132,14 +132,14 @@ func (h *handler) SetTags(w http.ResponseWriter, r *http.Request, ps httprouter.
 	for _, id := range tags {
 		_, err := h.service.Tag.GetTagByID(id[0], userID)
 		if err != nil {
-			utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+			utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
 			return
 		}
 		tagsIDs = append(tagsIDs, id[0])
 	}
 
 	if err := h.service.Note.SetTags(noteID, tagsIDs); err != nil {
-		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
 		return
 	}
 
@@ -163,7 +163,7 @@ func (h *handler) RemoveTags(w http.ResponseWriter, r *http.Request, ps httprout
 
 	note, err := h.service.Note.GetNoteByID(noteID, userID)
 	if err != nil {
-		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
 		return
 	}
 
@@ -172,14 +172,14 @@ func (h *handler) RemoveTags(w http.ResponseWriter, r *http.Request, ps httprout
 	for _, id := range tags {
 		_, err := h.service.Tag.GetTagByID(id[0], userID)
 		if err != nil {
-			utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+			utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
 			return
 		}
 		tagsIDs = append(tagsIDs, id[0])
 	}
 
 	if err := h.service.Note.RemoveTags(noteID, tagsIDs); err != nil {
-		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
 		return
 	}
 
@@ -201,18 +201,18 @@ func (h *handler) GetAllNotesWithTags(w http.ResponseWriter, r *http.Request, _ 
 
 	notes, err := h.service.Note.GetAllNotesByUser(userID)
 	if err != nil {
-		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
 		return
 	}
 
 	if len(notes) == 0 {
-		utils.Abort(w, http.StatusBadRequest, err, errors.ErrNotesListEmpty)
+		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrNotesListEmpty)
 		return
 	}
 
 	notesResp, err := h.service.Note.GetAllNotesWithTags(userID, notes)
 	if err != nil {
-		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
 		return
 	}
 
@@ -227,13 +227,13 @@ func (h *handler) GetNoteWithAllTags(w http.ResponseWriter, r *http.Request, ps 
 
 	note, err := h.service.Note.GetNoteByID(noteID, userID)
 	if err != nil {
-		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
 		return
 	}
 
 	noteResp, err := h.service.Note.GetNoteWithAllTags(userID, noteID, note)
 	if err != nil {
-		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
 		return
 	}
 

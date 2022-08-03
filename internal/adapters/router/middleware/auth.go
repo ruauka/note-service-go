@@ -15,19 +15,19 @@ func CheckToken(next httprouter.Handle, auth services.UserAuthService) httproute
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		header := r.Header.Get("Authorization")
 		if header == "" {
-			utils.Abort(w, http.StatusUnauthorized, nil, errors.ErrEmptyAuthHeader)
+			utils.ErrCheck(w, http.StatusUnauthorized, nil, errors.ErrEmptyAuthHeader)
 			return
 		}
 
 		headerParts := strings.Split(header, " ")
 		if len(headerParts) != 2 {
-			utils.Abort(w, http.StatusUnauthorized, nil, errors.ErrInvalidAuthHeader)
+			utils.ErrCheck(w, http.StatusUnauthorized, nil, errors.ErrInvalidAuthHeader)
 			return
 		}
 
 		userId, err := auth.ParseToken(headerParts[1])
 		if err != nil {
-			utils.Abort(w, http.StatusUnauthorized, nil, err)
+			utils.ErrCheck(w, http.StatusUnauthorized, nil, err)
 			return
 		}
 

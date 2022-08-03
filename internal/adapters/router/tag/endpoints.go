@@ -24,7 +24,7 @@ func (h *handler) CreateTag(w http.ResponseWriter, r *http.Request, _ httprouter
 
 	tag, err := h.service.Tag.CreateTag(tag, userID)
 	if err != nil {
-		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
 		return
 	}
 
@@ -41,7 +41,7 @@ func (h *handler) GetTagByID(w http.ResponseWriter, r *http.Request, ps httprout
 
 	tag, err := h.service.Tag.GetTagByID(ps.ByName("id"), userID)
 	if err != nil {
-		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
 		return
 	}
 
@@ -55,12 +55,12 @@ func (h *handler) GetAllTagsByUser(w http.ResponseWriter, r *http.Request, _ htt
 
 	tags, err := h.service.Tag.GetAllTagsByUser(userID)
 	if err != nil {
-		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
 		return
 	}
 
 	if len(tags) == 0 {
-		utils.Abort(w, http.StatusBadRequest, err, errors.ErrTagsListEmpty)
+		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrTagsListEmpty)
 		return
 	}
 
@@ -81,13 +81,13 @@ func (h *handler) UpdateTag(w http.ResponseWriter, r *http.Request, ps httproute
 
 	_, err := h.service.Tag.GetTagByID(tagID, userID)
 	if err != nil {
-		utils.Abort(w, http.StatusBadRequest, err, errors.ErrTagNotExists)
+		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrTagNotExists)
 		return
 	}
 
 	err = h.service.Tag.UpdateTag(tag, tagID)
 	if err != nil {
-		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
 		return
 	}
 
@@ -104,7 +104,7 @@ func (h *handler) DeleteTag(w http.ResponseWriter, r *http.Request, ps httproute
 
 	tagID, err := h.service.Tag.DeleteTag(ps.ByName("id"), userID)
 	if err != nil {
-		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
 		return
 	}
 

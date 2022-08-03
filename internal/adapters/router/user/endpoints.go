@@ -22,13 +22,8 @@ func (h *handler) RegisterUser(w http.ResponseWriter, r *http.Request, _ httprou
 
 	user, err := h.service.Auth.RegisterUser(newUser)
 	if err != nil {
-		if checkErr := utils.CheckDbErr(err.Error(), utils.User, newUser.Username); checkErr != nil {
-			utils.Abort(w, http.StatusBadRequest, nil, checkErr)
-			return
-		} else {
-			utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
-			return
-		}
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.User, newUser.Username)
+		return
 	}
 
 	resp := make(map[string]string)
@@ -46,13 +41,8 @@ func (h *handler) GenerateToken(w http.ResponseWriter, r *http.Request, _ httpro
 
 	token, err := h.service.Auth.GenerateToken(user.Username, user.Password)
 	if err != nil {
-		if checkErr := utils.CheckDbErr(err.Error(), utils.User, user.Username); checkErr != nil {
-			utils.Abort(w, http.StatusBadRequest, nil, checkErr)
-			return
-		} else {
-			utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
-			return
-		}
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.User, user.Username)
+		return
 	}
 
 	resp := make(map[string]string)
@@ -64,12 +54,12 @@ func (h *handler) GenerateToken(w http.ResponseWriter, r *http.Request, _ httpro
 func (h *handler) GetAllUsers(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	users, err := h.service.User.GetAllUsers()
 	if err != nil {
-		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, "", "")
 		return
 	}
 
 	if len(users) == 0 {
-		utils.Abort(w, http.StatusBadRequest, err, errors.ErrUsersListEmpty)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrUsersListEmpty, "", "")
 		return
 	}
 
@@ -81,13 +71,8 @@ func (h *handler) GetUserByID(w http.ResponseWriter, r *http.Request, ps httprou
 
 	user, err := h.service.User.GetUserByID(userID)
 	if err != nil {
-		if checkErr := utils.CheckDbErr(err.Error(), utils.User, userID); checkErr != nil {
-			utils.Abort(w, http.StatusBadRequest, nil, checkErr)
-			return
-		} else {
-			utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
-			return
-		}
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.User, userID)
+		return
 	}
 
 	utils.MakeJsonResponse(w, http.StatusOK, user)
@@ -103,18 +88,13 @@ func (h *handler) UpdateUser(w http.ResponseWriter, r *http.Request, ps httprout
 
 	_, err := h.service.User.GetUserByID(userID)
 	if err != nil {
-		if checkErr := utils.CheckDbErr(err.Error(), utils.User, userID); checkErr != nil {
-			utils.Abort(w, http.StatusBadRequest, nil, checkErr)
-			return
-		} else {
-			utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
-			return
-		}
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.User, userID)
+		return
 	}
 
 	err = h.service.User.UpdateUser(newUser, userID)
 	if err != nil {
-		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, "", "")
 		return
 	}
 
@@ -129,18 +109,13 @@ func (h *handler) DeleteUser(w http.ResponseWriter, r *http.Request, ps httprout
 
 	_, err := h.service.User.GetUserByID(userID)
 	if err != nil {
-		if checkErr := utils.CheckDbErr(err.Error(), utils.User, userID); checkErr != nil {
-			utils.Abort(w, http.StatusBadRequest, nil, checkErr)
-			return
-		} else {
-			utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
-			return
-		}
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.User, userID)
+		return
 	}
 
 	id, err := h.service.User.DeleteUser(userID)
 	if err != nil {
-		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, "", "")
 		return
 	}
 

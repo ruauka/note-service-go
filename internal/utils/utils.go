@@ -63,8 +63,29 @@ func GeneratePasswordHash(password string) string {
 	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
 }
 
-// Abort - ответ UI.
-func Abort(w http.ResponseWriter, httpStatus int, err, errDesc error) {
+func MakeJsonResponse(w http.ResponseWriter, httpStatus int, resp interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(httpStatus)
+	json.NewEncoder(w).Encode(resp)
+}
+
+func Abort(w http.ResponseWriter, httpStatus int, err, errDesc error, name, instance string) {
+	if err != nil {
+		if instanceErr := ErrDbCheck(err.Error(), name, instance); instanceErr != nil {
+			ErrCheck(w, httpStatus, nil, instanceErr)
+			return
+		} else {
+			ErrCheck(w, httpStatus, err, errDesc)
+			return
+		}
+	} else {
+		ErrCheck(w, httpStatus, err, errDesc)
+		return
+	}
+}
+
+// ErrCheck - ответ UI.
+func ErrCheck(w http.ResponseWriter, httpStatus int, err, errDesc error) {
 	// nolint:errcheck,gosec
 	json.NewEncoder(SetErrRespHeaders(w, httpStatus)).Encode(MapErrCreate(err, errDesc))
 	log.Println(errDesc.Error())
@@ -89,13 +110,7 @@ func MapErrCreate(err, errDesc error) map[string]string {
 	return errMap
 }
 
-func MakeJsonResponse(w http.ResponseWriter, httpStatus int, resp interface{}) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(httpStatus)
-	json.NewEncoder(w).Encode(resp)
-}
-
-func CheckDbErr(dbErr, name, instance string) error {
+func ErrDbCheck(dbErr, name, instance string) error {
 	switch {
 	case strings.Contains(dbErr, errors.ErrDbDuplicate):
 		return fmt.Errorf(fmt.Sprintf("%s '%s' is already exists", name, instance))
