@@ -43,7 +43,10 @@ func (n *noteService) RemoveTags(noteID string, tags []string) error {
 	return n.storage.RemoveTags(noteID, tags)
 }
 
-func (n *noteService) GetAllNotesWithTags(userID string, notes []dto.NotesResp) ([]dto.NotesWithTagsResp, error) {
+func (n *noteService) GetAllNotesWithTags(userID string, notes []dto.NotesResp) ([]dto.NoteWithTagsResp, error) {
 	return n.storage.GetAllNotesWithTags(userID, notes)
+}
 
+func (n *noteService) GetNoteWithAllTags(userID, NoteID string, note *dto.NoteResp) (dto.NoteWithTagsResp, error) {
+	return n.storage.GetNoteWithAllTags(userID, NoteID, note)
 }

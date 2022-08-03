@@ -210,7 +210,7 @@ func (h *handler) GetAllNotesWithTags(w http.ResponseWriter, r *http.Request, _ 
 		return
 	}
 
-	tempNotes, err := h.service.Note.GetAllNotesWithTags(userID, notes)
+	notesResp, err := h.service.Note.GetAllNotesWithTags(userID, notes)
 	if err != nil {
 		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
 		return
@@ -218,5 +218,26 @@ func (h *handler) GetAllNotesWithTags(w http.ResponseWriter, r *http.Request, _ 
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(tempNotes)
+	json.NewEncoder(w).Encode(notesResp)
+}
+
+func (h *handler) GetNoteWithAllTags(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	userID := r.Header.Get("user_id")
+	noteID := ps.ByName("id")
+
+	note, err := h.service.Note.GetNoteByID(noteID, userID)
+	if err != nil {
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		return
+	}
+
+	noteResp, err := h.service.Note.GetNoteWithAllTags(userID, noteID, note)
+	if err != nil {
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(noteResp)
 }

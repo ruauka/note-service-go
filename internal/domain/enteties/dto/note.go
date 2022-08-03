@@ -16,14 +16,14 @@ type NotesResp struct {
 	Info  string `json:"info"`
 }
 
-type NotesWithTags struct {
+type NoteWithTags struct {
 	ID       string `json:"id"`
 	Title    string `json:"title"`
 	Info     string `json:"info"`
 	TagsResp `json:"tags"`
 }
 
-type NotesWithTagsResp struct {
+type NoteWithTagsResp struct {
 	ID       string     `json:"id"`
 	Title    string     `json:"title"`
 	Info     string     `json:"info"`

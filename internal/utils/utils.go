@@ -20,6 +20,7 @@ const (
 	NotesURL       = "/notes"
 	NoteURL        = "/notes/:id"
 	AllTagsByNotes = "/allnotes/tags"
+	AllTagsByNote  = "/notes/:id/tags"
 )
 
 const (

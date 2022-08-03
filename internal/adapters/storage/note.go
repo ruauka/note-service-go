@@ -110,8 +110,8 @@ func (n *noteStorage) RemoveTags(noteID string, tags []string) error {
 	return nil
 }
 
-func (n *noteStorage) GetAllNotesWithTags(userID string, notes []dto.NotesResp) ([]dto.NotesWithTagsResp, error) {
-	resultNotes := make([]dto.NotesWithTagsResp, len(notes), len(notes))
+func (n *noteStorage) GetAllNotesWithTags(userID string, notes []dto.NotesResp) ([]dto.NoteWithTagsResp, error) {
+	resultNotes := make([]dto.NoteWithTagsResp, len(notes), len(notes))
 
 	for index, note := range notes {
 		query := fmt.Sprintf("SELECT notes.id, notes.title, notes.info, tags.id, tags.tagname"+
@@ -127,7 +127,7 @@ func (n *noteStorage) GetAllNotesWithTags(userID string, notes []dto.NotesResp) 
 		}
 
 		for row.Next() {
-			var note dto.NotesWithTags
+			var note dto.NoteWithTags
 
 			if err := row.Scan(&note.ID, &note.Title, &note.Info, &note.TagsResp.ID, &note.TagsResp.TagName); err != nil {
 				log.Println(err)
@@ -141,4 +141,35 @@ func (n *noteStorage) GetAllNotesWithTags(userID string, notes []dto.NotesResp) 
 	}
 
 	return resultNotes, nil
+}
+
+func (n *noteStorage) GetNoteWithAllTags(userID, NoteID string, note *dto.NoteResp) (dto.NoteWithTagsResp, error) {
+	var resultNote dto.NoteWithTagsResp
+
+	query := fmt.Sprintf("SELECT notes.id, notes.title, notes.info, tags.id, tags.tagname"+
+		" FROM %s JOIN notes_tags"+
+		" ON notes.id = notes_tags.note_id"+
+		" JOIN tags"+
+		" ON notes_tags.tag_id = tags.id"+
+		" AND tags.user_id = $1 AND notes.id = $2", utils.NotesTable)
+
+	row, err := n.db.Query(query, userID, NoteID)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	for row.Next() {
+		var note dto.NoteWithTags
+
+		if err := row.Scan(&note.ID, &note.Title, &note.Info, &note.TagsResp.ID, &note.TagsResp.TagName); err != nil {
+			log.Println(err)
+		}
+
+		resultNote.ID = note.ID
+		resultNote.Title = note.Title
+		resultNote.Info = note.Info
+		resultNote.TagsResp = append(resultNote.TagsResp, note.TagsResp)
+	}
+
+	return resultNote, nil
 }
