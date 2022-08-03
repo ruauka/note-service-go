@@ -7,6 +7,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 
+	"web/internal/adapters/router/validate"
 	"web/internal/domain/enteties/dto"
 	"web/internal/domain/enteties/model"
 	"web/internal/domain/errors"
@@ -46,6 +47,12 @@ func (h *handler) GetNoteByID(w http.ResponseWriter, r *http.Request, ps httprou
 func (h *handler) CreateNote(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	newNote := &model.Note{}
 	if err := json.NewDecoder(r.Body).Decode(&newNote); err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+	// Валидация объекта структуры Note //
+	err := validate.InputJsonValidate(newNote)
+	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return
 	}

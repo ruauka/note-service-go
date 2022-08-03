@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-playground/validator/v10"
+
 	"web/internal/domain/errors"
 )
 
@@ -56,6 +58,8 @@ const (
 )
 
 const salt = "abc"
+
+var Validate = validator.New()
 
 func GeneratePasswordHash(password string) string {
 	hash := sha1.New()

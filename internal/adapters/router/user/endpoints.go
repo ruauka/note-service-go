@@ -7,6 +7,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 
+	"web/internal/adapters/router/validate"
 	"web/internal/domain/enteties/dto"
 	"web/internal/domain/enteties/model"
 	"web/internal/domain/errors"
@@ -16,6 +17,12 @@ import (
 func (h *handler) RegisterUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	newUser := &model.User{}
 	if err := json.NewDecoder(r.Body).Decode(&newUser); err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+	// Валидация объекта структуры User //
+	err := validate.InputJsonValidate(newUser)
+	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return
 	}
@@ -35,6 +42,12 @@ func (h *handler) RegisterUser(w http.ResponseWriter, r *http.Request, _ httprou
 func (h *handler) GenerateToken(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	user := dto.UserAuth{}
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+	// Валидация объекта структуры UserAuth //
+	err := validate.InputJsonValidate(user)
+	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return
 	}

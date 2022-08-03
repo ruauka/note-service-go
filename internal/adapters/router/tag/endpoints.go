@@ -7,6 +7,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 
+	"web/internal/adapters/router/validate"
 	"web/internal/domain/enteties/dto"
 	"web/internal/domain/enteties/model"
 	"web/internal/domain/errors"
@@ -16,6 +17,12 @@ import (
 func (h *handler) CreateTag(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	newTag := &model.Tag{}
 	if err := json.NewDecoder(r.Body).Decode(&newTag); err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+	// Валидация объекта структуры Tag //
+	err := validate.InputJsonValidate(newTag)
+	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return
 	}

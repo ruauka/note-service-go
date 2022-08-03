@@ -2,7 +2,7 @@ package model
 
 type Note struct {
 	ID     string `json:"id" db:"id"`
-	Title  string `json:"title"`
-	Info   string `json:"info"`
+	Title  string `json:"title" validate:"required"`
+	Info   string `json:"info" validate:"required"`
 	UserID string `json:"user_id"`
 }
