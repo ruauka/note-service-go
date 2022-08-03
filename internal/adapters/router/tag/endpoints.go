@@ -14,40 +14,37 @@ import (
 )
 
 func (h *handler) CreateTag(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	tag := &model.Tag{}
-	if err := json.NewDecoder(r.Body).Decode(&tag); err != nil {
+	newTag := &model.Tag{}
+	if err := json.NewDecoder(r.Body).Decode(&newTag); err != nil {
 		http.Error(w, err.Error(), 400)
 		return
 	}
 
 	userID := r.Header.Get("user_id")
 
-	tag, err := h.service.Tag.CreateTag(tag, userID)
+	tag, err := h.service.Tag.CreateTag(newTag, userID)
 	if err != nil {
-		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Tag, newTag.TagName)
 		return
 	}
 
 	resp := make(map[string]string)
 	resp[fmt.Sprintf("Создан тэг '%s' с id", tag.TagName)] = tag.ID
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(resp)
+	utils.MakeJsonResponse(w, http.StatusCreated, resp)
 }
 
 func (h *handler) GetTagByID(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	userID := r.Header.Get("user_id")
+	tagID := ps.ByName("id")
 
-	tag, err := h.service.Tag.GetTagByID(ps.ByName("id"), userID)
+	tag, err := h.service.Tag.GetTagByID(tagID, userID)
 	if err != nil {
-		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Tag, tagID)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(tag)
+	utils.MakeJsonResponse(w, http.StatusOK, tag)
 }
 
 func (h *handler) GetAllTagsByUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -55,18 +52,16 @@ func (h *handler) GetAllTagsByUser(w http.ResponseWriter, r *http.Request, _ htt
 
 	tags, err := h.service.Tag.GetAllTagsByUser(userID)
 	if err != nil {
-		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, "", "")
 		return
 	}
 
 	if len(tags) == 0 {
-		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrTagsListEmpty)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrTagsListEmpty, "", "")
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(tags)
+	utils.MakeJsonResponse(w, http.StatusOK, tags)
 }
 
 func (h *handler) UpdateTag(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -81,37 +76,40 @@ func (h *handler) UpdateTag(w http.ResponseWriter, r *http.Request, ps httproute
 
 	_, err := h.service.Tag.GetTagByID(tagID, userID)
 	if err != nil {
-		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrTagNotExists)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Tag, tagID)
 		return
 	}
 
 	err = h.service.Tag.UpdateTag(tag, tagID)
 	if err != nil {
-		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, "", "")
 		return
 	}
 
 	resp := make(map[string]string)
 	resp["Обновлен тэг с id"] = tagID
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(resp)
+	utils.MakeJsonResponse(w, http.StatusOK, resp)
 }
 
 func (h *handler) DeleteTag(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	userID := r.Header.Get("user_id")
+	tagID := ps.ByName("id")
 
-	tagID, err := h.service.Tag.DeleteTag(ps.ByName("id"), userID)
+	_, err := h.service.Tag.GetTagByID(tagID, userID)
 	if err != nil {
-		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Tag, tagID)
+		return
+	}
+
+	id, err := h.service.Tag.DeleteTag(tagID, userID)
+	if err != nil {
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, "", "")
 		return
 	}
 
 	resp := make(map[string]int)
-	resp["Удален тэг с id"] = tagID
+	resp["Удален тэг с id"] = id
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(resp)
+	utils.MakeJsonResponse(w, http.StatusOK, resp)
 }
