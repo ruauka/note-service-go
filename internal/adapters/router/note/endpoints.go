@@ -18,55 +18,50 @@ func (h *handler) GetAllNotesByUser(w http.ResponseWriter, r *http.Request, _ ht
 
 	notes, err := h.service.Note.GetAllNotesByUser(userID)
 	if err != nil {
-		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, "", "")
 		return
 	}
 
 	if len(notes) == 0 {
-		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrNotesListEmpty)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrNotesListEmpty, "", "")
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(notes)
+	utils.MakeJsonResponse(w, http.StatusOK, notes)
 }
 
 func (h *handler) GetNoteByID(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	userID := r.Header.Get("user_id")
+	noteID := ps.ByName("id")
 
-	note, err := h.service.Note.GetNoteByID(ps.ByName("id"), userID)
+	note, err := h.service.Note.GetNoteByID(noteID, userID)
 	if err != nil {
-		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Note, noteID)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(note)
+	utils.MakeJsonResponse(w, http.StatusOK, note)
 }
 
 func (h *handler) CreateNote(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	note := &model.Note{}
-	if err := json.NewDecoder(r.Body).Decode(&note); err != nil {
+	newNote := &model.Note{}
+	if err := json.NewDecoder(r.Body).Decode(&newNote); err != nil {
 		http.Error(w, err.Error(), 400)
 		return
 	}
 
 	userID := r.Header.Get("user_id")
 
-	note, err := h.service.Note.CreateNote(note, userID)
+	note, err := h.service.Note.CreateNote(newNote, userID)
 	if err != nil {
-		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Note, newNote.Title)
 		return
 	}
 
 	resp := make(map[string]string)
 	resp[fmt.Sprintf("Создана заметка '%s' с id", note.Title)] = note.ID
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(resp)
+	utils.MakeJsonResponse(w, http.StatusCreated, resp)
 }
 
 func (h *handler) UpdateNote(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -81,39 +76,42 @@ func (h *handler) UpdateNote(w http.ResponseWriter, r *http.Request, ps httprout
 
 	_, err := h.service.Note.GetNoteByID(noteID, userID)
 	if err != nil {
-		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrNoteNotExists)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Note, noteID)
 		return
 	}
 
 	err = h.service.Note.UpdateNote(newNote, noteID)
 	if err != nil {
-		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, "", "")
 		return
 	}
 
 	resp := make(map[string]string)
 	resp["Обновлена заметка с id"] = noteID
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(resp)
+	utils.MakeJsonResponse(w, http.StatusOK, resp)
 }
 
 func (h *handler) DeleteNote(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	userID := r.Header.Get("user_id")
+	noteID := ps.ByName("id")
 
-	noteID, err := h.service.Note.DeleteNote(ps.ByName("id"), userID)
+	_, err := h.service.Note.GetNoteByID(noteID, userID)
 	if err != nil {
-		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Note, noteID)
+		return
+	}
+
+	id, err := h.service.Note.DeleteNote(noteID, userID)
+	if err != nil {
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, "", "")
 		return
 	}
 
 	resp := make(map[string]int)
-	resp["Удалена заметка с id"] = noteID
+	resp["Удалена заметка с id"] = id
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(resp)
+	utils.MakeJsonResponse(w, http.StatusOK, resp)
 }
 
 func (h *handler) SetTags(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -123,23 +121,23 @@ func (h *handler) SetTags(w http.ResponseWriter, r *http.Request, ps httprouter.
 
 	note, err := h.service.Note.GetNoteByID(noteID, userID)
 	if err != nil {
-		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Note, noteID)
 		return
 	}
 
 	tagsIDs := make([]string, 0, len(tags))
 
-	for _, id := range tags {
-		_, err := h.service.Tag.GetTagByID(id[0], userID)
+	for _, tagID := range tags {
+		_, err := h.service.Tag.GetTagByID(tagID[0], userID)
 		if err != nil {
-			utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+			utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Tag, tagID[0])
 			return
 		}
-		tagsIDs = append(tagsIDs, id[0])
+		tagsIDs = append(tagsIDs, tagID[0])
 	}
 
 	if err := h.service.Note.SetTags(noteID, tagsIDs); err != nil {
-		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, "", "")
 		return
 	}
 
@@ -151,9 +149,7 @@ func (h *handler) SetTags(w http.ResponseWriter, r *http.Request, ps httprouter.
 	resp := make(map[string]map[string]string)
 	resp[fmt.Sprintf("К заметке '%s' добавлены тэги", note.Title)] = tagResp
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(resp)
+	utils.MakeJsonResponse(w, http.StatusOK, resp)
 }
 
 func (h *handler) RemoveTags(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -163,23 +159,23 @@ func (h *handler) RemoveTags(w http.ResponseWriter, r *http.Request, ps httprout
 
 	note, err := h.service.Note.GetNoteByID(noteID, userID)
 	if err != nil {
-		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Note, noteID)
 		return
 	}
 
 	tagsIDs := make([]string, 0, len(tags))
 
-	for _, id := range tags {
-		_, err := h.service.Tag.GetTagByID(id[0], userID)
+	for _, tagID := range tags {
+		_, err := h.service.Tag.GetTagByID(tagID[0], userID)
 		if err != nil {
-			utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+			utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Tag, tagID[0])
 			return
 		}
-		tagsIDs = append(tagsIDs, id[0])
+		tagsIDs = append(tagsIDs, tagID[0])
 	}
 
 	if err := h.service.Note.RemoveTags(noteID, tagsIDs); err != nil {
-		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, "", "")
 		return
 	}
 
@@ -191,9 +187,7 @@ func (h *handler) RemoveTags(w http.ResponseWriter, r *http.Request, ps httprout
 	resp := make(map[string]map[string]string)
 	resp[fmt.Sprintf("У заметки '%s' удалены тэги", note.Title)] = tagResp
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(resp)
+	utils.MakeJsonResponse(w, http.StatusOK, resp)
 }
 
 func (h *handler) GetAllNotesWithTags(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -201,24 +195,27 @@ func (h *handler) GetAllNotesWithTags(w http.ResponseWriter, r *http.Request, _ 
 
 	notes, err := h.service.Note.GetAllNotesByUser(userID)
 	if err != nil {
-		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, "", "")
 		return
 	}
 
 	if len(notes) == 0 {
-		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrNotesListEmpty)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrNotesListEmpty, "", "")
 		return
 	}
 
 	notesResp, err := h.service.Note.GetAllNotesWithTags(userID, notes)
 	if err != nil {
-		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, "", "")
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(notesResp)
+	if len(notesResp) == 0 {
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrNotesListWithTagsEmpty, "", "")
+		return
+	}
+
+	utils.MakeJsonResponse(w, http.StatusOK, notesResp)
 }
 
 func (h *handler) GetNoteWithAllTags(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -227,17 +224,15 @@ func (h *handler) GetNoteWithAllTags(w http.ResponseWriter, r *http.Request, ps 
 
 	note, err := h.service.Note.GetNoteByID(noteID, userID)
 	if err != nil {
-		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Note, noteID)
 		return
 	}
 
 	noteResp, err := h.service.Note.GetNoteWithAllTags(userID, noteID, note)
 	if err != nil {
-		utils.ErrCheck(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, "", "")
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(noteResp)
+	utils.MakeJsonResponse(w, http.StatusOK, noteResp)
 }

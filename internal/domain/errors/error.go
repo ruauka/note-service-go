@@ -15,8 +15,8 @@ var (
 )
 
 var (
-	ErrNotesListEmpty = errors.New("no notes")
-	ErrNoteNotExists  = errors.New("note not exists")
+	ErrNotesListEmpty         = errors.New("no notes")
+	ErrNotesListWithTagsEmpty = errors.New("no notes with tags")
 )
 
 var (

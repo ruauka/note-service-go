@@ -111,7 +111,8 @@ func (n *noteStorage) RemoveTags(noteID string, tags []string) error {
 }
 
 func (n *noteStorage) GetAllNotesWithTags(userID string, notes []dto.NotesResp) ([]dto.NoteWithTagsResp, error) {
-	resultNotes := make([]dto.NoteWithTagsResp, len(notes), len(notes))
+	tempNotes := make([]dto.NoteWithTagsResp, len(notes), len(notes))
+	resultNotes := make([]dto.NoteWithTagsResp, 0)
 
 	for index, note := range notes {
 		query := fmt.Sprintf("SELECT notes.id, notes.title, notes.info, tags.id, tags.tagname"+
@@ -133,10 +134,18 @@ func (n *noteStorage) GetAllNotesWithTags(userID string, notes []dto.NotesResp) 
 				log.Println(err)
 			}
 
-			resultNotes[index].ID = note.ID
-			resultNotes[index].Title = note.Title
-			resultNotes[index].Info = note.Info
-			resultNotes[index].TagsResp = append(resultNotes[index].TagsResp, note.TagsResp)
+			if note.ID != "" {
+				tempNotes[index].ID = note.ID
+				tempNotes[index].Title = note.Title
+				tempNotes[index].Info = note.Info
+				tempNotes[index].TagsResp = append(tempNotes[index].TagsResp, note.TagsResp)
+			}
+		}
+	}
+
+	for _, note := range tempNotes {
+		if note.ID != "" {
+			resultNotes = append(resultNotes, note)
 		}
 	}
 
@@ -169,6 +178,10 @@ func (n *noteStorage) GetNoteWithAllTags(userID, NoteID string, note *dto.NoteRe
 		resultNote.Title = note.Title
 		resultNote.Info = note.Info
 		resultNote.TagsResp = append(resultNote.TagsResp, note.TagsResp)
+	}
+
+	if resultNote.ID == "" {
+		return dto.NoteWithTagsResp{}, fmt.Errorf(fmt.Sprintf("Note with id '%s' has no tags", NoteID))
 	}
 
 	return resultNote, nil
