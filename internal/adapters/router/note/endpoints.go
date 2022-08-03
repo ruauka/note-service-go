@@ -230,7 +230,7 @@ func (h *handler) GetNoteWithAllTags(w http.ResponseWriter, r *http.Request, ps 
 
 	noteResp, err := h.service.Note.GetNoteWithAllTags(userID, noteID, note)
 	if err != nil {
-		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, "", "")
+		utils.Abort(w, http.StatusBadRequest, nil, err, "", "")
 		return
 	}
 
