@@ -63,6 +63,13 @@ func GeneratePasswordHash(password string) string {
 	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
 }
 
+// Abort - ответ UI.
+func Abort(w http.ResponseWriter, httpStatus int, err, errDesc error) {
+	// nolint:errcheck,gosec
+	json.NewEncoder(SetErrRespHeaders(w, httpStatus)).Encode(MapErrCreate(err, errDesc))
+	log.Println(errDesc.Error())
+}
+
 // SetErrRespHeaders - установка необходимых хедеров для ответа с ошибкой.
 func SetErrRespHeaders(w http.ResponseWriter, httpStatus int) http.ResponseWriter {
 	w.Header().Set("Content-Type", "application/json")
@@ -82,11 +89,10 @@ func MapErrCreate(err, errDesc error) map[string]string {
 	return errMap
 }
 
-// Abort - ответ UI.
-func Abort(w http.ResponseWriter, httpStatus int, err, errDesc error) {
-	// nolint:errcheck,gosec
-	json.NewEncoder(SetErrRespHeaders(w, httpStatus)).Encode(MapErrCreate(err, errDesc))
-	log.Println(errDesc.Error())
+func MakeJsonResponse(w http.ResponseWriter, httpStatus int, resp interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(httpStatus)
+	json.NewEncoder(w).Encode(resp)
 }
 
 func CheckDbErr(dbErr, name, instance string) error {
@@ -108,10 +114,4 @@ func checkID(str string) bool {
 		return false
 	}
 	return true
-}
-
-func MakeJsonResponse(w http.ResponseWriter, httpStatus int, resp interface{}) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(httpStatus)
-	json.NewEncoder(w).Encode(resp)
 }

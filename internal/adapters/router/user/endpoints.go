@@ -22,8 +22,8 @@ func (h *handler) RegisterUser(w http.ResponseWriter, r *http.Request, _ httprou
 
 	user, err := h.service.Auth.RegisterUser(newUser)
 	if err != nil {
-		if err := utils.CheckDbErr(err.Error(), utils.User, newUser.Username); err != nil {
-			utils.Abort(w, http.StatusBadRequest, nil, err)
+		if checkErr := utils.CheckDbErr(err.Error(), utils.User, newUser.Username); checkErr != nil {
+			utils.Abort(w, http.StatusBadRequest, nil, checkErr)
 			return
 		} else {
 			utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
@@ -46,8 +46,8 @@ func (h *handler) GenerateToken(w http.ResponseWriter, r *http.Request, _ httpro
 
 	token, err := h.service.Auth.GenerateToken(user.Username, user.Password)
 	if err != nil {
-		if err := utils.CheckDbErr(err.Error(), utils.User, user.Username); err != nil {
-			utils.Abort(w, http.StatusBadRequest, nil, err)
+		if checkErr := utils.CheckDbErr(err.Error(), utils.User, user.Username); checkErr != nil {
+			utils.Abort(w, http.StatusBadRequest, nil, checkErr)
 			return
 		} else {
 			utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
@@ -81,8 +81,8 @@ func (h *handler) GetUserByID(w http.ResponseWriter, r *http.Request, ps httprou
 
 	user, err := h.service.User.GetUserByID(userID)
 	if err != nil {
-		if err := utils.CheckDbErr(err.Error(), utils.User, userID); err != nil {
-			utils.Abort(w, http.StatusBadRequest, nil, err)
+		if checkErr := utils.CheckDbErr(err.Error(), utils.User, userID); checkErr != nil {
+			utils.Abort(w, http.StatusBadRequest, nil, checkErr)
 			return
 		} else {
 			utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
@@ -103,8 +103,8 @@ func (h *handler) UpdateUser(w http.ResponseWriter, r *http.Request, ps httprout
 
 	_, err := h.service.User.GetUserByID(userID)
 	if err != nil {
-		if err := utils.CheckDbErr(err.Error(), utils.User, userID); err != nil {
-			utils.Abort(w, http.StatusBadRequest, nil, err)
+		if checkErr := utils.CheckDbErr(err.Error(), utils.User, userID); checkErr != nil {
+			utils.Abort(w, http.StatusBadRequest, nil, checkErr)
 			return
 		} else {
 			utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
@@ -129,8 +129,8 @@ func (h *handler) DeleteUser(w http.ResponseWriter, r *http.Request, ps httprout
 
 	_, err := h.service.User.GetUserByID(userID)
 	if err != nil {
-		if err := utils.CheckDbErr(err.Error(), utils.User, userID); err != nil {
-			utils.Abort(w, http.StatusBadRequest, nil, err)
+		if checkErr := utils.CheckDbErr(err.Error(), utils.User, userID); checkErr != nil {
+			utils.Abort(w, http.StatusBadRequest, nil, checkErr)
 			return
 		} else {
 			utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)

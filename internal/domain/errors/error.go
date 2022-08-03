@@ -10,7 +10,6 @@ var (
 
 var (
 	ErrUsersListEmpty    = errors.New("no users")
-	ErrUserNotExists     = errors.New("user not exists")
 	ErrEmptyAuthHeader   = errors.New("empty auth header")
 	ErrInvalidAuthHeader = errors.New("invalid auth header")
 )
