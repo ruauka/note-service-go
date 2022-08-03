@@ -3,7 +3,9 @@ package errors
 import "errors"
 
 var (
-	ErrDbResponse = errors.New("db response error")
+	ErrDbResponse  = errors.New("db response error")
+	ErrDbDuplicate = "duplicate key value violates unique constraint"
+	ErrDbNotExists = "no rows in result set"
 )
 
 var (

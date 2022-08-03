@@ -14,24 +14,27 @@ import (
 )
 
 func (h *handler) RegisterUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	user := &model.User{}
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+	newUser := &model.User{}
+	if err := json.NewDecoder(r.Body).Decode(&newUser); err != nil {
 		http.Error(w, err.Error(), 400)
 		return
 	}
 
-	user, err := h.service.Auth.RegisterUser(user)
+	user, err := h.service.Auth.RegisterUser(newUser)
 	if err != nil {
-		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
-		return
+		if err := utils.CheckDbErr(err.Error(), utils.User, newUser.Username); err != nil {
+			utils.Abort(w, http.StatusBadRequest, nil, err)
+			return
+		} else {
+			utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+			return
+		}
 	}
 
 	resp := make(map[string]string)
 	resp[fmt.Sprintf("Создан пользователь '%s' с id", user.Username)] = user.ID
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(resp)
+	utils.MakeJsonResponse(w, http.StatusCreated, resp)
 }
 
 func (h *handler) GenerateToken(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -43,16 +46,19 @@ func (h *handler) GenerateToken(w http.ResponseWriter, r *http.Request, _ httpro
 
 	token, err := h.service.Auth.GenerateToken(user.Username, user.Password)
 	if err != nil {
-		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
-		return
+		if err := utils.CheckDbErr(err.Error(), utils.User, user.Username); err != nil {
+			utils.Abort(w, http.StatusBadRequest, nil, err)
+			return
+		} else {
+			utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+			return
+		}
 	}
 
 	resp := make(map[string]string)
 	resp["token"] = token
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(resp)
+	utils.MakeJsonResponse(w, http.StatusOK, resp)
 }
 
 func (h *handler) GetAllUsers(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -67,21 +73,24 @@ func (h *handler) GetAllUsers(w http.ResponseWriter, r *http.Request, _ httprout
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(users)
+	utils.MakeJsonResponse(w, http.StatusOK, users)
 }
 
 func (h *handler) GetUserByID(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	user, err := h.service.User.GetUserByID(ps.ByName("id"))
+	userID := ps.ByName("id")
+
+	user, err := h.service.User.GetUserByID(userID)
 	if err != nil {
-		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
-		return
+		if err := utils.CheckDbErr(err.Error(), utils.User, userID); err != nil {
+			utils.Abort(w, http.StatusBadRequest, nil, err)
+			return
+		} else {
+			utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+			return
+		}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(user)
+	utils.MakeJsonResponse(w, http.StatusOK, user)
 }
 
 func (h *handler) UpdateUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -90,35 +99,46 @@ func (h *handler) UpdateUser(w http.ResponseWriter, r *http.Request, ps httprout
 		http.Error(w, err.Error(), 400)
 		return
 	}
+	userID := ps.ByName("id")
 
-	_, err := h.service.User.GetUserByID(ps.ByName("id"))
+	_, err := h.service.User.GetUserByID(userID)
 	if err != nil {
-		utils.Abort(w, http.StatusBadRequest, nil, errors.ErrUserNotExists)
-		return
+		if err := utils.CheckDbErr(err.Error(), utils.User, userID); err != nil {
+			utils.Abort(w, http.StatusBadRequest, nil, err)
+			return
+		} else {
+			utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+			return
+		}
 	}
 
-	err = h.service.User.UpdateUser(newUser, ps.ByName("id"))
+	err = h.service.User.UpdateUser(newUser, userID)
 	if err != nil {
 		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
 		return
 	}
 
 	resp := make(map[string]string)
-	resp["Обновлен пользователь с id"] = ps.ByName("id")
+	resp["Обновлен пользователь с id"] = userID
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(resp)
+	utils.MakeJsonResponse(w, http.StatusOK, resp)
 }
 
 func (h *handler) DeleteUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	_, err := h.service.User.GetUserByID(ps.ByName("id"))
+	userID := ps.ByName("id")
+
+	_, err := h.service.User.GetUserByID(userID)
 	if err != nil {
-		utils.Abort(w, http.StatusBadRequest, nil, errors.ErrUserNotExists)
-		return
+		if err := utils.CheckDbErr(err.Error(), utils.User, userID); err != nil {
+			utils.Abort(w, http.StatusBadRequest, nil, err)
+			return
+		} else {
+			utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
+			return
+		}
 	}
 
-	id, err := h.service.User.DeleteUser(ps.ByName("id"))
+	id, err := h.service.User.DeleteUser(userID)
 	if err != nil {
 		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse)
 		return
@@ -127,7 +147,5 @@ func (h *handler) DeleteUser(w http.ResponseWriter, r *http.Request, ps httprout
 	resp := make(map[string]int)
 	resp["Удален пользователь с id"] = id
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(resp)
+	utils.MakeJsonResponse(w, http.StatusOK, resp)
 }
