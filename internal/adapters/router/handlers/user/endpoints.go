@@ -134,7 +134,7 @@ func (h *handler) UpdateUser(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	resp := make(map[string]string)
-	resp["Обновлен пользователь с id"] = userID
+	resp["Updated user with id"] = userID
 
 	utils.MakeJsonResponse(w, http.StatusOK, resp)
 }
@@ -158,7 +158,7 @@ func (h *handler) DeleteUser(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	resp := make(map[string]int)
-	resp["Удален пользователь с id"] = id
+	resp["Deleted user with id"] = id
 
 	utils.MakeJsonResponse(w, http.StatusOK, resp)
 }

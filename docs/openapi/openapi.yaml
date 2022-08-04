@@ -5,6 +5,9 @@ info:
 paths:
   /register:
     post:
+      summary: Register new user
+      tags:
+        - Auth
       requestBody:
         content:
           application/json:
@@ -26,11 +29,11 @@ paths:
               example:
                 error: user 'User' is already exists
           description: Bad request
-      summary: Register new user
-      tags:
-        - Auth
   /login:
     post:
+      summary: Login user (get JWT token)
+      tags:
+        - Auth
       requestBody:
         content:
           application/json:
@@ -52,9 +55,114 @@ paths:
               example:
                 error: No user with name 'User'
           description: Bad request
-      summary: Login user (get JWT token)
+  /users:
+    get:
+      summary: Get all users
       tags:
-        - Auth
+        - Users
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAllUsersResponse'
+          description: Success request
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAllUsersResponseError'
+              example:
+                error: no users
+          description: Bad request
+  /users/{id}:
+    get:
+      summary: Get user by id
+      tags:
+        - Users
+      parameters:
+        - name: id
+          in: path
+          description: ID of user
+          required: true
+          schema:
+            type: integer
+            format: int
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUserByIDResponse'
+          description: Success request
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUserByIDResponseError'
+              example:
+                error: No user with id '1'
+          description: Bad request
+    put:
+      summary: Update user by id
+      tags:
+        - Users
+      parameters:
+        - name: id
+          in: path
+          description: ID of user
+          required: true
+          schema:
+            type: integer
+            format: int
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserByIDRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateUserByIDResponse'
+          description: Success request
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateUserByIDResponseError'
+              example:
+                error: No user with id '1'
+          description: Bad request
+    delete:
+      summary: Delete user by id
+      tags:
+        - Users
+      parameters:
+        - name: id
+          in: path
+          description: ID of user
+          required: true
+          schema:
+            type: integer
+            format: int
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteUserResponse'
+          description: Success request
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteUserResponseError'
+              example:
+                error: No user with id '1'
+          description: Bad request
 components:
   schemas:
     UserRegister:
@@ -101,6 +209,81 @@ components:
       required:
         - token
     UserLoginResponseError:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+    GetAllUsersResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+          username:
+            type: string
+        required:
+          - id
+          - username
+    GetAllUsersResponseError:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+    GetUserByIDResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+      required:
+        - id
+        - username
+    GetUserByIDResponseError:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+    UpdateUserByIDRequest:
+      additionalProperties: false
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
+    UpdateUserByIDResponse:
+      type: object
+      properties:
+        Updated user with id:
+          type: string
+      required:
+        - Updated user with id
+    UpdateUserByIDResponseError:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+    DeleteUserResponse:
+      type: object
+      properties:
+        Deleted user with id:
+          type: string
+      required:
+        - Deleted user with id
+    DeleteUserResponseError:
       type: object
       properties:
         error:

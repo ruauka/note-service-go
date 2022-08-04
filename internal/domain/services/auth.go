@@ -1,7 +1,6 @@
 package services
 
 import (
-	"errors"
 	"log"
 	"time"
 
@@ -10,6 +9,7 @@ import (
 	"web/internal/adapters/storage"
 	"web/internal/domain/enteties/dto"
 	"web/internal/domain/enteties/model"
+	"web/internal/domain/errors"
 	"web/internal/utils"
 )
 
@@ -51,7 +51,7 @@ func (a *authService) GenerateToken(userName, password string) (string, error) {
 func (a *authService) ParseToken(accessToken string) (string, error) {
 	token, err := jwt.ParseWithClaims(accessToken, &dto.TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, errors.New("invalid signing method")
+			return nil, errors.ErrSigningMethod
 		}
 		return []byte(utils.SigningKey), nil
 	})
@@ -62,7 +62,7 @@ func (a *authService) ParseToken(accessToken string) (string, error) {
 
 	claims, ok := token.Claims.(*dto.TokenClaims)
 	if !ok {
-		return "", errors.New("token claims are not of type *dto.TokenClaims")
+		return "", errors.ErrClaimsType
 	}
 
 	return claims.UserID, nil
