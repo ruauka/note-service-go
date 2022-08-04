@@ -6,21 +6,23 @@ import (
 	"web/internal/adapters/router/middleware"
 	"web/internal/domain/services"
 	"web/internal/utils"
+	"web/pkg/logger"
 )
 
 type handler struct {
 	service services.Services
-	// logger
+	logger  logger.Logger
 }
 
-func NewHandler(service *services.Services) *handler {
+func NewHandler(service *services.Services, logger *logger.Logger) *handler {
 	return &handler{
 		service: *service,
+		logger:  *logger,
 	}
 }
 
-func Register(router *httprouter.Router, service *services.Services) {
-	h := NewHandler(service)
+func Register(router *httprouter.Router, service *services.Services, logger *logger.Logger) {
+	h := NewHandler(service, logger)
 
 	router.GET(utils.NoteURL, middleware.CheckToken(h.GetNoteByID, h.service.Auth))
 	router.GET(utils.NotesURL, middleware.CheckToken(h.GetAllNotesByUser, h.service.Auth))

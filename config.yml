@@ -6,3 +6,5 @@ postgres:
   sslMode: disable
 app:
   port: 8000
+logger:
+  logLevel: 0 #0 - info, 2 - error

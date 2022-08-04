@@ -10,6 +10,7 @@ import (
 type Config struct {
 	Postgres `yaml:"postgres"`
 	App      `yaml:"app"`
+	Logger   `yaml:"logger"`
 }
 
 type Postgres struct {
@@ -22,8 +23,12 @@ type Postgres struct {
 }
 
 type App struct {
-	Port string `yaml:"port" env:"APP_PORT" env-default:"8000"`
+	Port string `yaml:"port" env:"APP_PORT" env-default:"8000"` //////////
 	//  APP_PORT=8001 go run cmd/main.go
+}
+
+type Logger struct {
+	LogLevel int `yaml:"logLevel" env:"LOG_LEVEL" env-default:"0"`
 }
 
 func GetConfig() *Config {

@@ -21,6 +21,7 @@ import (
 	"web/internal/config"
 	"web/internal/domain/services"
 	"web/pkg/database/postgres"
+	l "web/pkg/logger"
 )
 
 func Execute() {
@@ -33,11 +34,11 @@ func Execute() {
 
 	pgDB := storage.NewStorages(db)
 	service := services.NewServices(pgDB)
-
 	router := httprouter.New()
+	logger := l.NewLogger(cfg)
 
-	user.Register(router, service)
-	note.Register(router, service)
+	user.Register(router, service, logger)
+	note.Register(router, service, logger)
 	tag.Register(router, service)
 
 	srv := NewServer(cfg.App.Port, router)

@@ -27,6 +27,8 @@ func (h *handler) RegisterUser(w http.ResponseWriter, r *http.Request, _ httprou
 		return
 	}
 
+	h.logger.LoggerFromContext(r.Context()).Info("efefefef")
+
 	user, err := h.service.Auth.RegisterUser(newUser)
 	if err != nil {
 		utils.Abort(w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.User, newUser.Username)
