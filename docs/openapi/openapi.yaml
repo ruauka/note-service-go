@@ -12,14 +12,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserRegister'
+              $ref: '#/components/schemas/UserRequest'
         required: true
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserRegisterResponse'
+                $ref: '#/components/schemas/UserResponse'
           description: Success request
         "400":
           content:
@@ -38,7 +38,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserLogin'
+              $ref: '#/components/schemas/UserRequest'
         required: true
       responses:
         "200":
@@ -51,7 +51,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserLoginResponseError'
+                $ref: '#/components/schemas/UserResponseError'
               example:
                 error: No user with name 'User'
           description: Bad request
@@ -71,7 +71,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetAllUsersResponseError'
+                $ref: '#/components/schemas/UserResponseError'
               example:
                 error: no users
           description: Bad request
@@ -99,7 +99,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetUserByIDResponseError'
+                $ref: '#/components/schemas/UserResponseError'
               example:
                 error: No user with id '1'
           description: Bad request
@@ -119,7 +119,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateUserByIDRequest'
+              $ref: '#/components/schemas/UserRequest'
         required: true
       responses:
         "200":
@@ -132,7 +132,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UpdateUserByIDResponseError'
+                $ref: '#/components/schemas/UserResponseError'
               example:
                 error: No user with id '1'
           description: Bad request
@@ -159,13 +159,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DeleteUserResponseError'
+                $ref: '#/components/schemas/UserResponseError'
               example:
                 error: No user with id '1'
           description: Bad request
 components:
   schemas:
-    UserRegister:
+    UserRequest:
       additionalProperties: false
       type: object
       properties:
@@ -176,7 +176,7 @@ components:
       required:
         - username
         - password
-    UserRegisterResponse:
+    UserResponse:
       type: object
       properties:
         Created new user 'User' with id:
@@ -190,17 +190,6 @@ components:
           type: string
       required:
         - error
-    UserLogin:
-      additionalProperties: false
-      type: object
-      properties:
-        username:
-          type: string
-        password:
-          type: string
-      required:
-        - username
-        - password
     UserLoginResponse:
       type: object
       properties:
@@ -208,13 +197,6 @@ components:
           type: string
       required:
         - token
-    UserLoginResponseError:
-      type: object
-      properties:
-        error:
-          type: string
-      required:
-        - error
     GetAllUsersResponse:
       type: array
       items:
@@ -227,13 +209,6 @@ components:
         required:
           - id
           - username
-    GetAllUsersResponseError:
-      type: object
-      properties:
-        error:
-          type: string
-      required:
-        - error
     GetUserByIDResponse:
       type: object
       properties:
@@ -244,24 +219,6 @@ components:
       required:
         - id
         - username
-    GetUserByIDResponseError:
-      type: object
-      properties:
-        error:
-          type: string
-      required:
-        - error
-    UpdateUserByIDRequest:
-      additionalProperties: false
-      type: object
-      properties:
-        username:
-          type: string
-        password:
-          type: string
-      required:
-        - username
-        - password
     UpdateUserByIDResponse:
       type: object
       properties:
@@ -269,13 +226,6 @@ components:
           type: string
       required:
         - Updated user with id
-    UpdateUserByIDResponseError:
-      type: object
-      properties:
-        error:
-          type: string
-      required:
-        - error
     DeleteUserResponse:
       type: object
       properties:
@@ -283,10 +233,3 @@ components:
           type: string
       required:
         - Deleted user with id
-    DeleteUserResponseError:
-      type: object
-      properties:
-        error:
-          type: string
-      required:
-        - error
