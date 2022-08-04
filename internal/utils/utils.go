@@ -1,10 +1,10 @@
 package utils
 
 import (
+	"context"
 	"crypto/sha1"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -13,6 +13,7 @@ import (
 	"github.com/go-playground/validator/v10"
 
 	"web/internal/domain/errors"
+	"web/pkg/logger"
 )
 
 const (
@@ -73,26 +74,25 @@ func MakeJsonResponse(w http.ResponseWriter, httpStatus int, resp interface{}) {
 	json.NewEncoder(w).Encode(resp)
 }
 
-func Abort(w http.ResponseWriter, httpStatus int, err, errDesc error, name, instance string) {
+func Abort(ctx context.Context, w http.ResponseWriter, httpStatus int, err, errDesc error, name, instance string) {
 	if err != nil {
 		if instanceErr := ErrDbCheck(err.Error(), name, instance); instanceErr != nil {
-			ErrCheck(w, httpStatus, nil, instanceErr)
+			ErrCheck(ctx, w, httpStatus, nil, instanceErr)
 			return
 		} else {
-			ErrCheck(w, httpStatus, err, errDesc)
+			ErrCheck(ctx, w, httpStatus, err, errDesc)
 			return
 		}
 	} else {
-		ErrCheck(w, httpStatus, err, errDesc)
+		ErrCheck(ctx, w, httpStatus, err, errDesc)
 		return
 	}
 }
 
 // ErrCheck - ответ UI.
-func ErrCheck(w http.ResponseWriter, httpStatus int, err, errDesc error) {
+func ErrCheck(ctx context.Context, w http.ResponseWriter, httpStatus int, err, errDesc error) {
 	// nolint:errcheck,gosec
-	json.NewEncoder(SetErrRespHeaders(w, httpStatus)).Encode(MapErrCreate(err, errDesc))
-	log.Println(errDesc.Error())
+	json.NewEncoder(SetErrRespHeaders(w, httpStatus)).Encode(MapErrCreate(ctx, err, errDesc))
 }
 
 // SetErrRespHeaders - установка необходимых хедеров для ответа с ошибкой.
@@ -103,13 +103,16 @@ func SetErrRespHeaders(w http.ResponseWriter, httpStatus int) http.ResponseWrite
 }
 
 // MapErrCreate - Создание словаря с ошибкой для ответа UI.
-func MapErrCreate(err, errDesc error) map[string]string {
+func MapErrCreate(ctx context.Context, err, errDesc error) map[string]string {
 	errMap := make(map[string]string)
 	if err == nil {
 		errMap["error"] = errDesc.Error()
+		logger.LogFromContext(ctx).Error(errDesc.Error())
 	} else {
 		errMap["error"] = errDesc.Error()
 		errMap["desc"] = err.Error()
+		logger.LogFromContext(ctx).Error(err.Error())
+		logger.LogFromContext(ctx).Error(errDesc.Error())
 	}
 	return errMap
 }

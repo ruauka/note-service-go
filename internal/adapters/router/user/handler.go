@@ -5,28 +5,27 @@ import (
 
 	"web/internal/domain/services"
 	"web/internal/utils"
-	"web/pkg/logger"
 )
 
 type handler struct {
-	service services.Services
-	logger  logger.Logger
+	service       services.Services
+	logMiddleware func(next httprouter.Handle) httprouter.Handle
 }
 
-func NewHandler(service *services.Services, logger *logger.Logger) *handler {
+func NewHandler(service *services.Services, logFn func(next httprouter.Handle) httprouter.Handle) *handler {
 	return &handler{
-		service: *service,
-		logger:  *logger,
+		service:       *service,
+		logMiddleware: logFn,
 	}
 }
 
-func Register(router *httprouter.Router, service *services.Services, logger *logger.Logger) {
-	h := NewHandler(service, logger)
+func Register(router *httprouter.Router, service *services.Services, logFn func(next httprouter.Handle) httprouter.Handle) {
+	h := NewHandler(service, logFn)
 
-	router.POST(utils.Register, h.logger.LogMiddleware(h.RegisterUser))
-	router.POST(utils.Login, h.GenerateToken)
-	router.GET(utils.UsersURL, h.GetAllUsers)
-	router.GET(utils.UserURL, h.GetUserByID)
-	router.PUT(utils.UserURL, h.UpdateUser)
-	router.DELETE(utils.UserURL, h.DeleteUser)
+	router.POST(utils.Register, h.logMiddleware(h.RegisterUser))
+	router.POST(utils.Login, h.logMiddleware(h.GenerateToken))
+	router.GET(utils.UsersURL, h.logMiddleware(h.GetAllUsers))
+	router.GET(utils.UserURL, h.logMiddleware(h.GetUserByID))
+	router.PUT(utils.UserURL, h.logMiddleware(h.UpdateUser))
+	router.DELETE(utils.UserURL, h.logMiddleware(h.DeleteUser))
 }

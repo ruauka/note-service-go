@@ -36,9 +36,10 @@ func Execute() {
 	service := services.NewServices(pgDB)
 	router := httprouter.New()
 	logger := l.NewLogger(cfg)
+	loggingMiddleware := l.NewLoggerMiddleware(logger)
 
-	user.Register(router, service, logger)
-	note.Register(router, service, logger)
+	user.Register(router, service, loggingMiddleware)
+	note.Register(router, service, loggingMiddleware)
 	tag.Register(router, service)
 
 	srv := NewServer(cfg.App.Port, router)

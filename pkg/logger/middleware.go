@@ -78,3 +78,8 @@ func (r *responseWriterDelegator) Write(b []byte) (int, error) {
 	r.written += int64(n)
 	return n, err
 }
+
+// LogFromContext returns logger.
+func LogFromContext(ctx context.Context) *zap.Logger {
+	return ctx.Value("logger").(*zap.Logger)
+}

@@ -6,32 +6,31 @@ import (
 	"web/internal/adapters/router/middleware"
 	"web/internal/domain/services"
 	"web/internal/utils"
-	"web/pkg/logger"
 )
 
 type handler struct {
-	service services.Services
-	logger  logger.Logger
+	service       services.Services
+	logMiddleware func(next httprouter.Handle) httprouter.Handle
 }
 
-func NewHandler(service *services.Services, logger *logger.Logger) *handler {
+func NewHandler(service *services.Services, logFn func(next httprouter.Handle) httprouter.Handle) *handler {
 	return &handler{
-		service: *service,
-		logger:  *logger,
+		service:       *service,
+		logMiddleware: logFn,
 	}
 }
 
-func Register(router *httprouter.Router, service *services.Services, logger *logger.Logger) {
-	h := NewHandler(service, logger)
+func Register(router *httprouter.Router, service *services.Services, logFn func(next httprouter.Handle) httprouter.Handle) {
+	h := NewHandler(service, logFn)
 
-	router.GET(utils.NoteURL, middleware.CheckToken(h.GetNoteByID, h.service.Auth))
-	router.GET(utils.NotesURL, middleware.CheckToken(h.GetAllNotesByUser, h.service.Auth))
-	router.POST(utils.NotesURL, middleware.CheckToken(h.CreateNote, h.service.Auth))
-	router.PUT(utils.NoteURL, middleware.CheckToken(h.UpdateNote, h.service.Auth))
-	router.DELETE(utils.NoteURL, middleware.CheckToken(h.DeleteNote, h.service.Auth))
+	router.GET(utils.NoteURL, h.logMiddleware(middleware.CheckToken(h.GetNoteByID, h.service.Auth)))
+	router.GET(utils.NotesURL, h.logMiddleware(middleware.CheckToken(h.GetAllNotesByUser, h.service.Auth)))
+	router.POST(utils.NotesURL, h.logMiddleware(middleware.CheckToken(h.CreateNote, h.service.Auth)))
+	router.PUT(utils.NoteURL, h.logMiddleware(middleware.CheckToken(h.UpdateNote, h.service.Auth)))
+	router.DELETE(utils.NoteURL, h.logMiddleware(middleware.CheckToken(h.DeleteNote, h.service.Auth)))
 
-	router.PUT(utils.TagsSet, middleware.CheckToken(h.SetTags, h.service.Auth))
-	router.PUT(utils.TagsRemove, middleware.CheckToken(h.RemoveTags, h.service.Auth))
-	router.GET(utils.AllTagsByNotes, middleware.CheckToken(h.GetAllNotesWithTags, h.service.Auth))
-	router.GET(utils.AllTagsByNote, middleware.CheckToken(h.GetNoteWithAllTags, h.service.Auth))
+	router.PUT(utils.TagsSet, h.logMiddleware(middleware.CheckToken(h.SetTags, h.service.Auth)))
+	router.PUT(utils.TagsRemove, h.logMiddleware(middleware.CheckToken(h.RemoveTags, h.service.Auth)))
+	router.GET(utils.AllTagsByNotes, h.logMiddleware(middleware.CheckToken(h.GetAllNotesWithTags, h.service.Auth)))
+	router.GET(utils.AllTagsByNote, h.logMiddleware(middleware.CheckToken(h.GetNoteWithAllTags, h.service.Auth)))
 }
