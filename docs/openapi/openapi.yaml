@@ -1,0 +1,109 @@
+openapi: 3.0.3
+info:
+  title: "{{ .AppName }}"
+  version: "{{ .AppVersion }}"
+paths:
+  /register:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegister'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRegisterResponse'
+          description: Success request
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponseError'
+              example:
+                error: user 'User' is already exists
+          description: Bad request
+      summary: Register new user
+      tags:
+        - Auth
+  /login:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserLoginResponse'
+          description: Success request
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserLoginResponseError'
+              example:
+                error: No user with name 'User'
+          description: Bad request
+      summary: Login user (get JWT token)
+      tags:
+        - Auth
+components:
+  schemas:
+    UserRegister:
+      additionalProperties: false
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
+    UserRegisterResponse:
+      type: object
+      properties:
+        Created new user 'User' with id:
+          type: string
+      required:
+        - Created new user 'User' with id
+    UserResponseError:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+    UserLogin:
+      additionalProperties: false
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
+    UserLoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+      required:
+        - token
+    UserLoginResponseError:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error

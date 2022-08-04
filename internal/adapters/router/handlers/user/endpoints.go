@@ -40,7 +40,7 @@ func (h *handler) RegisterUser(w http.ResponseWriter, r *http.Request, _ httprou
 	}
 
 	resp := make(map[string]string)
-	resp[fmt.Sprintf("Создан пользователь '%s' с id", user.Username)] = user.ID
+	resp[fmt.Sprintf("Created new user '%s' with id", user.Username)] = user.ID
 
 	utils.MakeJsonResponse(w, http.StatusCreated, resp)
 }

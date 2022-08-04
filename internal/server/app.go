@@ -14,9 +14,10 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 
-	"web/internal/adapters/router/note"
-	"web/internal/adapters/router/tag"
-	"web/internal/adapters/router/user"
+	"web/internal/adapters/router/handlers/note"
+	"web/internal/adapters/router/handlers/tag"
+	"web/internal/adapters/router/handlers/user"
+	"web/internal/adapters/router/swagger"
 	s "web/internal/adapters/storage"
 	"web/internal/config"
 	"web/internal/domain/services"
@@ -38,6 +39,7 @@ func Execute() {
 	logger := l.NewLogger(cfg)
 	loggingMiddleware := l.NewLoggerMiddleware(logger)
 
+	swagger.Register(router)
 	user.Register(router, service, loggingMiddleware)
 	note.Register(router, service, loggingMiddleware)
 	tag.Register(router, service, loggingMiddleware)
