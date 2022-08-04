@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/julienschmidt/httprouter"
 
 	"web/internal/domain/errors"
 	"web/pkg/logger"
@@ -61,6 +62,8 @@ const (
 const salt = "abc"
 
 var Validate = validator.New()
+
+type LogMiddleware func(next httprouter.Handle) httprouter.Handle
 
 func GeneratePasswordHash(password string) string {
 	hash := sha1.New()

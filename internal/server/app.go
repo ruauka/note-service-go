@@ -40,7 +40,7 @@ func Execute() {
 
 	user.Register(router, service, loggingMiddleware)
 	note.Register(router, service, loggingMiddleware)
-	tag.Register(router, service)
+	tag.Register(router, service, loggingMiddleware)
 
 	srv := NewServer(cfg.App.Port, router)
 

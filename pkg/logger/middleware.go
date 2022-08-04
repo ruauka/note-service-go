@@ -47,7 +47,7 @@ func (l LogMiddleware) Handler(next httprouter.Handle) httprouter.Handle {
 			zap.Int("status_code", rw.status),
 		}
 
-		if rw.status == 500 || rw.status == 400 {
+		if rw.status == 500 || rw.status == 400 || rw.status == 401 {
 			l.Error("failed", labels...)
 			return
 		}

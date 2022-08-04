@@ -10,17 +10,17 @@ import (
 
 type handler struct {
 	service       services.Services
-	logMiddleware func(next httprouter.Handle) httprouter.Handle
+	logMiddleware utils.LogMiddleware
 }
 
-func NewHandler(service *services.Services, logFn func(next httprouter.Handle) httprouter.Handle) *handler {
+func NewHandler(service *services.Services, logFn utils.LogMiddleware) *handler {
 	return &handler{
 		service:       *service,
 		logMiddleware: logFn,
 	}
 }
 
-func Register(router *httprouter.Router, service *services.Services, logFn func(next httprouter.Handle) httprouter.Handle) {
+func Register(router *httprouter.Router, service *services.Services, logFn utils.LogMiddleware) {
 	h := NewHandler(service, logFn)
 
 	router.GET(utils.NoteURL, h.logMiddleware(middleware.CheckToken(h.GetNoteByID, h.service.Auth)))
