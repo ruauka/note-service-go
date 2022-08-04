@@ -13,17 +13,17 @@ type Config struct {
 }
 
 type Postgres struct {
-	Host     string `yaml:"host" env:"HOSTPG" env-default:"localhost"`
-	Port     string `yaml:"port" env:"PORTPG" env-default:"5432"`
-	Username string `yaml:"username" env:"PGUSERNAME" env-default:"pg"`
-	Password string `yaml:"password" env:"PASSWORD" env-default:"pass"`
-	DBName   string `yaml:"dbName" env:"DBNAME" env-default:"crud"`
-	SSLMode  string `yaml:"sslMode" env:"SSLMODE" env-default:"disable"`
+	Host     string `yaml:"host" env:"PSQL_HOST" env-default:"localhost"`
+	Port     string `yaml:"port" env:"PSQL_PORT" env-default:"5432"`
+	Username string `yaml:"username" env:"PSQL_USERNAME" env-default:"pg"`
+	Password string `yaml:"password" env:"PSQL_PASSWORD" env-default:"pass"`
+	DBName   string `yaml:"dbName" env:"PSQL_DBNAME" env-default:"crud"`
+	SSLMode  string `yaml:"sslMode" env:"PSQL_SSLMODE" env-default:"disable"`
 }
 
 type App struct {
-	Port string `yaml:"port" env:"PORTAPP" env-default:"8000"`
-	//  PORTAPP=8001 go run cmd/main.go
+	Port string `yaml:"port" env:"APP_PORT" env-default:"8000"`
+	//  APP_PORT=8001 go run cmd/main.go
 }
 
 func GetConfig() *Config {
