@@ -6,20 +6,22 @@ import (
 	"time"
 
 	"github.com/julienschmidt/httprouter"
+
+	"web/internal/config"
 )
 
 type Server struct {
 	httpServer *http.Server
 }
 
-func NewServer(port string, router *httprouter.Router) *Server {
+func NewServer(cfg *config.Config, router *httprouter.Router) *Server {
 	return &Server{
 		httpServer: &http.Server{
-			Addr:           ":" + port,
+			Addr:           ":" + cfg.App.Port,
 			Handler:        router,
 			MaxHeaderBytes: 1 << 20, // 1 MB
-			WriteTimeout:   time.Second * 10,
-			ReadTimeout:    time.Second * 10,
+			WriteTimeout:   time.Second * time.Duration(cfg.WriteTimeout),
+			ReadTimeout:    time.Second * time.Duration(cfg.ReadTimeout),
 		},
 	}
 }

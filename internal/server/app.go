@@ -17,7 +17,7 @@ import (
 	"web/internal/adapters/router/note"
 	"web/internal/adapters/router/tag"
 	"web/internal/adapters/router/user"
-	"web/internal/adapters/storage"
+	s "web/internal/adapters/storage"
 	"web/internal/config"
 	"web/internal/domain/services"
 	"web/pkg/database/postgres"
@@ -32,8 +32,8 @@ func Execute() {
 		log.Fatalf("failed to init db: %s", err.Error())
 	}
 
-	pgDB := storage.NewStorages(db)
-	service := services.NewServices(pgDB)
+	storage := s.NewStorages(db)
+	service := services.NewServices(storage)
 	router := httprouter.New()
 	logger := l.NewLogger(cfg)
 	loggingMiddleware := l.NewLoggerMiddleware(logger)
@@ -42,7 +42,7 @@ func Execute() {
 	note.Register(router, service, loggingMiddleware)
 	tag.Register(router, service, loggingMiddleware)
 
-	srv := NewServer(cfg.App.Port, router)
+	srv := NewServer(cfg, router)
 
 	go func() {
 		if err := srv.Start(); err != nil && !errors.Is(err, http.ErrServerClosed) {

@@ -18,13 +18,14 @@ type Postgres struct {
 	Port     string `yaml:"port" env:"PSQL_PORT" env-default:"5432"`
 	Username string `yaml:"username" env:"PSQL_USERNAME" env-default:"pg"`
 	Password string `yaml:"password" env:"PSQL_PASSWORD" env-default:"pass"`
-	DBName   string `yaml:"dbName" env:"PSQL_DBNAME" env-default:"crud"`
-	SSLMode  string `yaml:"sslMode" env:"PSQL_SSLMODE" env-default:"disable"`
+	DBName   string `yaml:"dbName" env:"PSQL_DB_NAME" env-default:"crud"`
+	SSLMode  string `yaml:"sslMode" env:"PSQL_SSL_MODE" env-default:"disable"`
 }
 
 type App struct {
-	Port string `yaml:"port" env:"APP_PORT" env-default:"8000"` //////////
-	//  APP_PORT=8001 go run cmd/main.go
+	Port         string `yaml:"port" env:"APP_PORT" env-default:"8000"`
+	WriteTimeout int    `yaml:"writeTimeout" env:"APP_WRITE_TIMEOUT" env-default:"10"`
+	ReadTimeout  int    `yaml:"readTimeout" env:"APP_READ_TIMEOUT" env-default:"10"`
 }
 
 type Logger struct {
@@ -43,3 +44,5 @@ func GetConfig() *Config {
 	})
 	return cfg
 }
+
+//  APP_PORT=8001 go run cmd/main.go
