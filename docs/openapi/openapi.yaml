@@ -429,7 +429,7 @@ paths:
           description: Bad request
   /notes/{id}/tags:
     get:
-      summary: Get all notes with all tags by user
+      summary: Get note with all tags by user
       tags:
         - Notes
       security:
