@@ -35,11 +35,11 @@ func (n *noteService) DeleteNote(noteID, userID string) (int, error) {
 	return n.storage.DeleteNote(noteID, userID)
 }
 
-func (n *noteService) SetTags(noteID string, tags []string) error {
+func (n *noteService) SetTags(noteID string, tags map[string]string) (string, error) {
 	return n.storage.SetTags(noteID, tags)
 }
 
-func (n *noteService) RemoveTags(noteID string, tags []string) error {
+func (n *noteService) RemoveTags(noteID string, tags map[string]string) (string, error) {
 	return n.storage.RemoveTags(noteID, tags)
 }
 

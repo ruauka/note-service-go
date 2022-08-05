@@ -114,7 +114,6 @@ func MapErrCreate(ctx context.Context, err, errDesc error) map[string]string {
 	} else {
 		errMap["error"] = errDesc.Error()
 		errMap["desc"] = err.Error()
-		logger.LogFromContext(ctx).Error(err.Error())
 		logger.LogFromContext(ctx).Error(errDesc.Error())
 	}
 	return errMap

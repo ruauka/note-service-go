@@ -296,7 +296,7 @@ paths:
       parameters:
         - name: id
           in: path
-          description: ID of user
+          description: ID of note
           required: true
           schema:
             type: integer
@@ -315,6 +315,150 @@ paths:
                 $ref: '#/components/schemas/ResponseError'
               example:
                 error: No note with id '1'
+          description: Bad request
+  /notes/{id}/tags/set:
+    put:
+      summary: Set tags to note
+      tags:
+        - Notes
+      security:
+        - JWT:
+            - write:notes
+            - read:notes
+      parameters:
+        - name: id
+          in: path
+          description: ID of note
+          required: true
+          schema:
+            type: integer
+            format: int
+        - name: tag
+          in: query
+          description: ID of tag to set to note
+          required: true
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SetTagsToNote'
+          description: Success request
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+              example:
+                error1: No note with id '1'
+                error2: No tag with id '1'
+                error3: Tag 'tag' is already set
+          description: Bad request
+  /notes/{id}/tags/remove:
+    put:
+      summary: Remove tags from note
+      tags:
+        - Notes
+      security:
+        - JWT:
+            - write:notes
+            - read:notes
+      parameters:
+        - name: id
+          in: path
+          description: ID of note
+          required: true
+          schema:
+            type: integer
+            format: int
+        - name: tag
+          in: query
+          description: ID of tag to remove from note
+          required: true
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemoveTagsToNote'
+          description: Success request
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+              example:
+                error1: No note with id '1'
+                error2: No tag with id '1'
+                error3: Tag 'tag' is already set
+          description: Bad request
+  /allnotes/tags:
+    get:
+      summary: Get all notes with all tags by user
+      tags:
+        - Notes
+      security:
+        - JWT:
+            - write:notes
+            - read:notes
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAllNotesWithAllTags'
+          description: Success request
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+              example:
+                error1: No notes
+                error2: No notes with tags
+          description: Bad request
+  /notes/{id}/tags:
+    get:
+      summary: Get all notes with all tags by user
+      tags:
+        - Notes
+      security:
+        - JWT:
+            - write:notes
+            - read:notes
+      parameters:
+        - name: id
+          in: path
+          description: ID of note
+          required: true
+          schema:
+            type: integer
+            format: int
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetNoteWithAllTags'
+          description: Success request
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+              example:
+                error1: No notes
+                error2: No notes with tags
           description: Bad request
   /tags:
     post:
@@ -615,6 +759,84 @@ components:
           type: string
       required:
         - Deleted note with id
+    SetTagsToNote:
+      type: object
+      properties:
+        To note 'Note' set tags:
+          type: object
+          properties:
+            tag:
+              type: string
+          required:
+            - tag
+      required:
+        - To note 'Note' set tags
+    RemoveTagsToNote:
+      type: object
+      properties:
+        From note 'Note' remove tags:
+          type: object
+          properties:
+            tag:
+              type: string
+          required:
+            - tag
+      required:
+        - From note 'Note' remove tags
+    GetAllNotesWithAllTags:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+          title:
+            type: string
+          info:
+            type: string
+          tags:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: string
+                tagname:
+                  type: string
+              required:
+                - id
+                - tagname
+        required:
+          - id
+          - title
+          - info
+          - tags
+    GetNoteWithAllTags:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        info:
+          type: string
+        tags:
+          type: array
+          items:
+            - type: object
+              properties:
+                id:
+                  type: string
+                tagname:
+                  type: string
+              required:
+                - id
+                - tagname
+      required:
+        - id
+        - title
+        - info
+        - tags
     TagRequest:
       type: object
       properties:

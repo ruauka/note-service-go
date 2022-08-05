@@ -151,31 +151,27 @@ func (h *handler) SetTags(w http.ResponseWriter, r *http.Request, ps httprouter.
 		return
 	}
 
-	tagsIDs := make([]string, 0, len(tags))
+	tagsMap := make(map[string]string)
 
-	for _, tagID := range tags {
-		_, err := h.service.Tag.GetTagByID(tagID[0], userID)
+	for _, tagID := range tags["tag"] {
+		tag, err := h.service.Tag.GetTagByID(tagID, userID)
 		if err != nil {
-			utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Tag, tagID[0])
+			utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Tag, tagID)
 			logger.LogFromContext(ctx).Error(err.Error())
 			return
 		}
-		tagsIDs = append(tagsIDs, tagID[0])
+		tagsMap[tagID] = tag.TagName
 	}
 
-	if err := h.service.Note.SetTags(noteID, tagsIDs); err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDbResponse, "", "")
+	tagId, err := h.service.Note.SetTags(noteID, tagsMap)
+	if err != nil {
+		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Tag, tagId)
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
 
-	tagResp := make(map[string]string)
-	for tag, id := range tags {
-		tagResp[tag] = id[0]
-	}
-
 	resp := make(map[string]map[string]string)
-	resp[fmt.Sprintf("К заметке '%s' добавлены тэги", note.Title)] = tagResp
+	resp[fmt.Sprintf("To note '%s' set tags", note.Title)] = tagsMap
 
 	utils.MakeJsonResponse(w, http.StatusOK, resp)
 }
@@ -193,31 +189,27 @@ func (h *handler) RemoveTags(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 
-	tagsIDs := make([]string, 0, len(tags))
+	tagsMap := make(map[string]string)
 
-	for _, tagID := range tags {
-		_, err := h.service.Tag.GetTagByID(tagID[0], userID)
+	for _, tagID := range tags["tag"] {
+		tag, err := h.service.Tag.GetTagByID(tagID, userID)
 		if err != nil {
-			utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Tag, tagID[0])
+			utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Tag, tagID)
 			logger.LogFromContext(ctx).Error(err.Error())
 			return
 		}
-		tagsIDs = append(tagsIDs, tagID[0])
+		tagsMap[tagID] = tag.TagName
 	}
 
-	if err := h.service.Note.RemoveTags(noteID, tagsIDs); err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDbResponse, "", "")
+	tagId, err := h.service.Note.RemoveTags(noteID, tagsMap)
+	if err != nil {
+		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Tag, tagId)
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
 
-	tagResp := make(map[string]string)
-	for tag, id := range tags {
-		tagResp[tag] = id[0]
-	}
-
 	resp := make(map[string]map[string]string)
-	resp[fmt.Sprintf("У заметки '%s' удалены тэги", note.Title)] = tagResp
+	resp[fmt.Sprintf("From note '%s' deleted tags", note.Title)] = tagsMap
 
 	utils.MakeJsonResponse(w, http.StatusOK, resp)
 }
