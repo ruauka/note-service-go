@@ -70,7 +70,7 @@ func (h *handler) GenerateToken(w http.ResponseWriter, r *http.Request, _ httpro
 	}
 
 	resp := make(map[string]string)
-	resp["token"] = token
+	resp["token"] = fmt.Sprintf("Bearer %s", token)
 
 	utils.MakeJsonResponse(w, http.StatusOK, resp)
 }

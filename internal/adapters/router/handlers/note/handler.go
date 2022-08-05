@@ -23,9 +23,9 @@ func NewHandler(service *services.Services, logFn utils.LogMiddleware) *handler 
 func Register(router *httprouter.Router, service *services.Services, logFn utils.LogMiddleware) {
 	h := NewHandler(service, logFn)
 
-	router.GET(utils.NoteURL, h.logMiddleware(middleware.CheckToken(h.GetNoteByID, h.service.Auth)))
-	router.GET(utils.NotesURL, h.logMiddleware(middleware.CheckToken(h.GetAllNotesByUser, h.service.Auth)))
 	router.POST(utils.NotesURL, h.logMiddleware(middleware.CheckToken(h.CreateNote, h.service.Auth)))
+	router.GET(utils.NotesURL, h.logMiddleware(middleware.CheckToken(h.GetAllNotesByUser, h.service.Auth)))
+	router.GET(utils.NoteURL, h.logMiddleware(middleware.CheckToken(h.GetNoteByID, h.service.Auth)))
 	router.PUT(utils.NoteURL, h.logMiddleware(middleware.CheckToken(h.UpdateNote, h.service.Auth)))
 	router.DELETE(utils.NoteURL, h.logMiddleware(middleware.CheckToken(h.DeleteNote, h.service.Auth)))
 

@@ -76,7 +76,7 @@ func (h *handler) CreateNote(w http.ResponseWriter, r *http.Request, _ httproute
 	}
 
 	resp := make(map[string]string)
-	resp[fmt.Sprintf("Создана заметка '%s' с id", note.Title)] = note.ID
+	resp[fmt.Sprintf("Created note '%s' with id", note.Title)] = note.ID
 
 	utils.MakeJsonResponse(w, http.StatusCreated, resp)
 }
@@ -108,7 +108,7 @@ func (h *handler) UpdateNote(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	resp := make(map[string]string)
-	resp["Обновлена заметка с id"] = noteID
+	resp["Updated note with id"] = noteID
 
 	utils.MakeJsonResponse(w, http.StatusOK, resp)
 }
@@ -133,7 +133,7 @@ func (h *handler) DeleteNote(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	resp := make(map[string]int)
-	resp["Удалена заметка с id"] = id
+	resp["Deleted note with id"] = id
 
 	utils.MakeJsonResponse(w, http.StatusOK, resp)
 }

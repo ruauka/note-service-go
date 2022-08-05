@@ -25,7 +25,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserResponseError'
+                $ref: '#/components/schemas/ResponseError'
               example:
                 error: user 'User' is already exists
           description: Bad request
@@ -51,7 +51,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserResponseError'
+                $ref: '#/components/schemas/ResponseError'
               example:
                 error: No user with name 'User'
           description: Bad request
@@ -71,7 +71,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserResponseError'
+                $ref: '#/components/schemas/ResponseError'
               example:
                 error: no users
           description: Bad request
@@ -99,7 +99,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserResponseError'
+                $ref: '#/components/schemas/ResponseError'
               example:
                 error: No user with id '1'
           description: Bad request
@@ -119,7 +119,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserRequest'
+              $ref: '#/components/schemas/UpdateUserRequest'
         required: true
       responses:
         "200":
@@ -132,7 +132,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserResponseError'
+                $ref: '#/components/schemas/ResponseError'
               example:
                 error: No user with id '1'
           description: Bad request
@@ -159,11 +159,169 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserResponseError'
+                $ref: '#/components/schemas/ResponseError'
               example:
                 error: No user with id '1'
           description: Bad request
+  /notes:
+    post:
+      summary: Create new note
+      security:
+        - JWT:
+            - write:notes
+            - read:notes
+      tags:
+        - Notes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoteRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoteResponse'
+          description: Success request
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+              example:
+                error: note 'Note' is already exists
+          description: Bad request
+    get:
+      summary: Get all notes
+      tags:
+        - Notes
+      security:
+        - JWT:
+            - write:notes
+            - read:notes
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAllNotesResponse'
+          description: Success request
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+              example:
+                error: no notes
+          description: Bad request
+  /notes/{id}:
+    get:
+      summary: Get note by id
+      tags:
+        - Notes
+      security:
+        - JWT:
+            - write:notes
+            - read:notes
+      parameters:
+        - name: id
+          in: path
+          description: ID of note
+          required: true
+          schema:
+            type: integer
+            format: int
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetNoteByIDResponse'
+          description: Success request
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+              example:
+                error: No note with id '1'
+          description: Bad request
+    put:
+      summary: Update note by id
+      tags:
+        - Notes
+      security:
+        - JWT:
+            - write:notes
+            - read:notes
+      parameters:
+        - name: id
+          in: path
+          description: ID of note
+          required: true
+          schema:
+            type: integer
+            format: int
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateNoteRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateNoteByIDResponse'
+          description: Success request
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+              example:
+                error: No note with id '1'
+          description: Bad request
+    delete:
+      summary: Delete note by id
+      tags:
+        - Notes
+      security:
+        - JWT:
+            - write:notes
+            - read:notes
+      parameters:
+        - name: id
+          in: path
+          description: ID of user
+          required: true
+          schema:
+            type: integer
+            format: int
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteNoteResponse'
+          description: Success request
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+              example:
+                error: No note with id '1'
+          description: Bad request
 components:
+  securitySchemes:
+    JWT:
+      type: apiKey
+      name: Authorization
+      in: header
   schemas:
     UserRequest:
       additionalProperties: false
@@ -176,6 +334,14 @@ components:
       required:
         - username
         - password
+    UpdateUserRequest:
+      additionalProperties: false
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
     UserResponse:
       type: object
       properties:
@@ -183,7 +349,7 @@ components:
           type: string
       required:
         - Created new user 'User' with id
-    UserResponseError:
+    ResponseError:
       type: object
       properties:
         error:
@@ -233,3 +399,66 @@ components:
           type: string
       required:
         - Deleted user with id
+    NoteRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        info:
+          type: string
+      required:
+        - title
+        - info
+    NoteResponse:
+      type: object
+      properties:
+        Created note 'Note' with id:
+          type: string
+      required:
+        - Created note 'Note' with id
+    GetAllNotesResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+          title:
+            type: string
+          info:
+            type: string
+        required:
+          - id
+          - title
+          - info
+    GetNoteByIDResponse:
+      type: object
+      properties:
+        title:
+          type: string
+        info:
+          type: string
+      required:
+        - title
+        - info
+    UpdateNoteRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        info:
+          type: string
+    UpdateNoteByIDResponse:
+      type: object
+      properties:
+        Updated note with id:
+          type: string
+      required:
+        - Updated note with id
+    DeleteNoteResponse:
+      type: object
+      properties:
+        Deleted note with id:
+          type: string
+      required:
+        - Deleted note with id
