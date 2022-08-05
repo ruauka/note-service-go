@@ -316,6 +316,159 @@ paths:
               example:
                 error: No note with id '1'
           description: Bad request
+  /tags:
+    post:
+      summary: Create new tag
+      security:
+        - JWT:
+            - write:tags
+            - read:tags
+      tags:
+        - Tags
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagResponse'
+          description: Success request
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+              example:
+                error: tag 'Tag' is already exists
+          description: Bad request
+    get:
+      summary: Get all tags
+      tags:
+        - Tags
+      security:
+        - JWT:
+            - write:tags
+            - read:tags
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAllTagsResponse'
+          description: Success request
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+              example:
+                error: no tags
+          description: Bad request
+  /tags/{id}:
+    get:
+      summary: Get tag by id
+      tags:
+        - Tags
+      security:
+        - JWT:
+            - write:tags
+            - read:tags
+      parameters:
+        - name: id
+          in: path
+          description: ID of tag
+          required: true
+          schema:
+            type: integer
+            format: int
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagRequest'
+          description: Success request
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+              example:
+                error: No tag with id '1'
+          description: Bad request
+    put:
+      summary: Update tag by id
+      tags:
+        - Tags
+      security:
+        - JWT:
+            - write:tags
+            - read:tags
+      parameters:
+        - name: id
+          in: path
+          description: ID of tag
+          required: true
+          schema:
+            type: integer
+            format: int
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateTagByIDResponse'
+          description: Success request
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+              example:
+                error: No tag with id '1'
+          description: Bad request
+    delete:
+      summary: Delete tag by id
+      tags:
+        - Tags
+      security:
+        - JWT:
+            - write:tags
+            - read:tags
+      parameters:
+        - name: id
+          in: path
+          description: ID of tag
+          required: true
+          schema:
+            type: integer
+            format: int
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteTagResponse'
+          description: Success request
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+              example:
+                error: No tag with id '1'
+          description: Bad request
 components:
   securitySchemes:
     JWT:
@@ -462,3 +615,43 @@ components:
           type: string
       required:
         - Deleted note with id
+    TagRequest:
+      type: object
+      properties:
+        tagname:
+          type: string
+      required:
+        - tagname
+    TagResponse:
+      type: object
+      properties:
+        Created tag 'Tag' with id:
+          type: string
+      required:
+        - Created tag 'Tag' with id
+    GetAllTagsResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+          tagname:
+            type: string
+        required:
+          - id
+          - tagname
+    UpdateTagByIDResponse:
+      type: object
+      properties:
+        Updated tag with id:
+          type: string
+      required:
+        - Updated tag with id
+    DeleteTagResponse:
+      type: object
+      properties:
+        Deleted tag with id:
+          type: string
+      required:
+        - Deleted tag with id

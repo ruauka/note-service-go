@@ -23,9 +23,9 @@ func NewHandler(service *services.Services, logFn utils.LogMiddleware) *handler 
 func Register(router *httprouter.Router, service *services.Services, logFn utils.LogMiddleware) {
 	h := NewHandler(service, logFn)
 
-	router.GET(utils.TagURL, h.logMiddleware(middleware.CheckToken(h.GetTagByID, h.service.Auth)))
-	router.GET(utils.TagsURL, h.logMiddleware(middleware.CheckToken(h.GetAllTagsByUser, h.service.Auth)))
 	router.POST(utils.TagsURL, h.logMiddleware(middleware.CheckToken(h.CreateTag, h.service.Auth)))
+	router.GET(utils.TagsURL, h.logMiddleware(middleware.CheckToken(h.GetAllTagsByUser, h.service.Auth)))
+	router.GET(utils.TagURL, h.logMiddleware(middleware.CheckToken(h.GetTagByID, h.service.Auth)))
 	router.PUT(utils.TagURL, h.logMiddleware(middleware.CheckToken(h.UpdateTag, h.service.Auth)))
 	router.DELETE(utils.TagURL, h.logMiddleware(middleware.CheckToken(h.DeleteTag, h.service.Auth)))
 }

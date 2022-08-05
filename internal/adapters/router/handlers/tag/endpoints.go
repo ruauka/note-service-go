@@ -41,7 +41,7 @@ func (h *handler) CreateTag(w http.ResponseWriter, r *http.Request, _ httprouter
 	}
 
 	resp := make(map[string]string)
-	resp[fmt.Sprintf("Создан тэг '%s' с id", tag.TagName)] = tag.ID
+	resp[fmt.Sprintf("Created tag '%s' with id", tag.TagName)] = tag.ID
 
 	utils.MakeJsonResponse(w, http.StatusCreated, resp)
 }
@@ -108,7 +108,7 @@ func (h *handler) UpdateTag(w http.ResponseWriter, r *http.Request, ps httproute
 	}
 
 	resp := make(map[string]string)
-	resp["Обновлен тэг с id"] = tagID
+	resp["Updated tag with id"] = tagID
 
 	utils.MakeJsonResponse(w, http.StatusOK, resp)
 }
@@ -133,7 +133,7 @@ func (h *handler) DeleteTag(w http.ResponseWriter, r *http.Request, ps httproute
 	}
 
 	resp := make(map[string]int)
-	resp["Удален тэг с id"] = id
+	resp["Delete tag with id"] = id
 
 	utils.MakeJsonResponse(w, http.StatusOK, resp)
 }
