@@ -6,6 +6,8 @@ import (
 	"web/internal/domain/enteties/model"
 )
 
+//go:generate mockgen -source=services.go -destination=mocks/mock.go
+
 type UserAuthService interface {
 	RegisterUser(user *model.User) (*model.User, error)
 	GenerateToken(userName, password string) (string, error)
