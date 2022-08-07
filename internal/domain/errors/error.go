@@ -11,6 +11,7 @@ var (
 var (
 	ErrUsersListEmpty    = errors.New("no users")
 	ErrEmptyAuthHeader   = errors.New("empty auth header")
+	ErrEmptyToken        = errors.New("empty token")
 	ErrInvalidAuthHeader = errors.New("invalid auth header")
 	ErrSigningMethod     = errors.New("invalid signing method")
 	ErrClaimsType        = errors.New("token claims are not of type *dto.TokenClaims")

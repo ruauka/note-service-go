@@ -60,7 +60,6 @@ func TestHandler_RegisterUser(t *testing.T) {
 			inputJson: `{
 				"username": "test_name
 			}`,
-			// service request
 			inputUser:          model.User{},
 			mockBehavior:       func(s *mock_services.MockUserAuthService, user model.User) {},
 			expectedStatusCode: http.StatusBadRequest,
@@ -72,7 +71,6 @@ func TestHandler_RegisterUser(t *testing.T) {
 			inputJson: `{
 				"username": "test_name"
 			}`,
-			// service request
 			inputUser:          model.User{},
 			mockBehavior:       func(s *mock_services.MockUserAuthService, user model.User) {},
 			expectedStatusCode: http.StatusBadRequest,
@@ -98,7 +96,7 @@ func TestHandler_RegisterUser(t *testing.T) {
 			expectedStatusCode: http.StatusBadRequest,
 			expectedResponse: `{"error":"user 'test_name' is already exists"}
 `,
-			testName: "test-4-service-user is already exists Err",
+			testName: "test-4-Service-user is already exists Err",
 		},
 		{
 			inputJson: `{
@@ -118,7 +116,7 @@ func TestHandler_RegisterUser(t *testing.T) {
 			expectedStatusCode: http.StatusBadRequest,
 			expectedResponse: `{"error":"No user with name 'test_name'"}
 `,
-			testName: "test-5-service-user not found",
+			testName: "test-5-Service-user not found",
 		},
 		{
 			inputJson: `{
@@ -138,7 +136,7 @@ func TestHandler_RegisterUser(t *testing.T) {
 			expectedStatusCode: http.StatusBadRequest,
 			expectedResponse: `{"desc":"some db Err","error":"db response error"}
 `,
-			testName: "test-6-db resp Err",
+			testName: "test-6-Service-db resp Err",
 		},
 	}
 
@@ -150,15 +148,15 @@ func TestHandler_RegisterUser(t *testing.T) {
 			// Init mock service
 			auth := mock_services.NewMockUserAuthService(c)
 			testCase.mockBehavior(auth, testCase.inputUser)
-			// Init logger
-			logger := l.NewLogger(&config.Config{})
+			// Init testing logger with "fatal" level (5)
+			logger := l.NewLogger(&config.Config{Logger: config.Logger{LogLevel: 5}})
 			loggingMiddleware := l.NewLoggerMiddleware(logger)
 			// Init service
 			service := &services.Services{Auth: auth}
 			handler := NewHandler(service, loggingMiddleware)
 			// Test server
 			router := httprouter.New()
-			router.POST(utils.Register, handler.logMiddleware(handler.RegisterUser))
+			router.POST(utils.Register, handler.LogMiddleware(handler.RegisterUser))
 			// Test Request
 			w := httptest.NewRecorder()
 			req := httptest.NewRequest(http.MethodPost, utils.Register, bytes.NewBufferString(testCase.inputJson))

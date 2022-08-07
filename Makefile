@@ -1,3 +1,7 @@
+# запуск тестов
+tests:
+	go test -cover ./...
+
 migrate create:
 	migrate create -ext sql -dir ./migrate -seq init
 
