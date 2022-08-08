@@ -17,7 +17,7 @@ func NewLogger(config *config.Config) *zap.Logger {
 
 	logger, err := cfg.Build()
 	if err != nil {
-		logger.Error("logger init error")
+		logger.Fatal("logger init error")
 	}
 
 	return logger

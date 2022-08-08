@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -32,16 +31,17 @@ func Execute() {
 
 	cfg := config.GetConfig()
 
-	db, err := postgres.NewPostgresConnect(cfg)
-	if err != nil {
-		log.Fatalf("failed to init db: %s", err.Error())
-	}
-
-	storage := s.NewStorages(db)
-	service := services.NewServices(storage)
-	router := httprouter.New()
 	logger := l.NewLogger(cfg)
 	loggingMiddleware := l.NewLoggerMiddleware(logger)
+
+	db, err := postgres.NewPostgresConnect(cfg)
+	if err != nil {
+		logger.Fatal(fmt.Sprintf("failed to init db: %s", err.Error()))
+	}
+
+	router := httprouter.New()
+	storage := s.NewStorages(db)
+	service := services.NewServices(storage)
 
 	swagger.Register(router)
 	user.Register(router, service, loggingMiddleware)
@@ -52,7 +52,7 @@ func Execute() {
 
 	go func() {
 		if err := srv.Start(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			log.Printf("error occurred while running http server: %s\n", err.Error())
+			logger.Fatal(fmt.Sprintf("error occurred while running http server: %s\n", err.Error()))
 		}
 	}()
 
