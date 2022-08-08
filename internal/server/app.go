@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -14,6 +15,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 
+	"web/docs"
 	"web/internal/adapters/router/handlers/note"
 	"web/internal/adapters/router/handlers/tag"
 	"web/internal/adapters/router/handlers/user"
@@ -26,6 +28,8 @@ import (
 )
 
 func Execute() {
+	docs.BuildInfo.Print()
+
 	cfg := config.GetConfig()
 
 	db, err := postgres.NewPostgresConnect(cfg)
@@ -52,7 +56,7 @@ func Execute() {
 		}
 	}()
 
-	log.Println("Starting server...")
+	logger.Info("Starting server...")
 
 	// Graceful Shutdown
 	quit := make(chan os.Signal, 1)
@@ -64,13 +68,13 @@ func Execute() {
 	ctx, shutdown := context.WithTimeout(context.Background(), timeout)
 	defer shutdown()
 
-	log.Println("Shutting down server...")
+	logger.Info("Shutting down server...")
 
 	if err := srv.Stop(ctx); err != nil {
-		log.Printf("error occured on srv shutting down: %s\n", err.Error())
+		logger.Error(fmt.Sprintf("error occured on srv shutting down: %s\n", err.Error()))
 	}
 
 	if err := db.Close(); err != nil {
-		log.Printf("error occured on db connection close: %s\n", err.Error())
+		logger.Error(fmt.Sprintf("error occured on db connection close: %s\n", err.Error()))
 	}
 }

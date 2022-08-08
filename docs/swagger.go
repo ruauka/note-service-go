@@ -2,29 +2,42 @@ package docs
 
 import (
 	"embed"
+	"encoding/json"
+	"fmt"
 	"html/template"
 	"io/fs"
 	"net/http"
+	"runtime"
 
 	"github.com/julienschmidt/httprouter"
 )
 
 var (
 	// AppName - application name.
-	AppName string
+	AppName = "Notes service"
 	// AppVersion - version application.
-	AppVersion string
+	AppVersion = "1.0"
+	// GoVersion - golang version.
+	GoVersion = runtime.Version()
 )
 
 // BuildInfo holds build information about the app.
 var BuildInfo = buildInfo{
 	AppName,
 	AppVersion,
+	GoVersion,
 }
 
 type buildInfo struct {
 	AppName    string `json:"app_name,omitempty"`
 	AppVersion string `json:"app_version,omitempty"`
+	Language   string `json:"go_version,omitempty"`
+}
+
+// Print information about the app to stdout.
+func (b *buildInfo) Print() {
+	i, _ := json.MarshalIndent(b, "", "   ")
+	fmt.Printf("Info:\n%v\n\n", string(i))
 }
 
 //go:embed swagger-ui

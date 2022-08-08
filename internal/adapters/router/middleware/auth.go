@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -25,7 +24,7 @@ func CheckToken(next httprouter.Handle, auth services.UserAuthService) httproute
 			utils.Abort(r.Context(), w, http.StatusUnauthorized, nil, errors.ErrInvalidAuthHeader, "", "")
 			return
 		}
-		fmt.Println(headerParts)
+
 		if headerParts[0] != "Bearer" {
 			utils.Abort(r.Context(), w, http.StatusUnauthorized, nil, errors.ErrInvalidAuthHeader, "", "")
 			return
