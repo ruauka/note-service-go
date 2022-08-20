@@ -1,5 +1,6 @@
 package model
 
+// Tag model.
 type Tag struct {
 	ID      string `json:"id"`
 	TagName string `json:"tagname" validate:"required"`

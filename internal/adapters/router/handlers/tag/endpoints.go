@@ -1,3 +1,4 @@
+// Package tag Package tag
 package tag
 
 import (
@@ -15,27 +16,28 @@ import (
 	"web/pkg/logger"
 )
 
+// CreateTag create tag.
 func (h *handler) CreateTag(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	userID := r.Header.Get("user_id")
 	ctx := r.Context()
 
 	newTag := &model.Tag{}
 	if err := json.NewDecoder(r.Body).Decode(&newTag); err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
 	// Валидация объекта структуры Tag //
-	err := validate.InputJsonValidate(newTag)
+	err := validate.InputJSONValidate(newTag)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
 
 	tag, err := h.service.Tag.CreateTag(newTag, userID)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Tag, newTag.TagName)
+		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, utils.Tag, newTag.TagName)
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
@@ -43,9 +45,10 @@ func (h *handler) CreateTag(w http.ResponseWriter, r *http.Request, _ httprouter
 	resp := make(map[string]string)
 	resp[fmt.Sprintf("Created tag '%s' with id", tag.TagName)] = tag.ID
 
-	utils.MakeJsonResponse(w, http.StatusCreated, resp)
+	utils.MakeJSONResponse(w, http.StatusCreated, resp)
 }
 
+// GetTagByID get tag by ID.
 func (h *handler) GetTagByID(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	userID := r.Header.Get("user_id")
 	tagID := ps.ByName("id")
@@ -53,21 +56,22 @@ func (h *handler) GetTagByID(w http.ResponseWriter, r *http.Request, ps httprout
 
 	tag, err := h.service.Tag.GetTagByID(tagID, userID)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Tag, tagID)
+		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, utils.Tag, tagID)
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
 
-	utils.MakeJsonResponse(w, http.StatusOK, tag)
+	utils.MakeJSONResponse(w, http.StatusOK, tag)
 }
 
+// GetAllTagsByUser get tag by user.
 func (h *handler) GetAllTagsByUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	userID := r.Header.Get("user_id")
 	ctx := r.Context()
 
 	tags, err := h.service.Tag.GetAllTagsByUser(userID)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDbResponse, "", "")
+		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, "", "")
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
@@ -78,9 +82,10 @@ func (h *handler) GetAllTagsByUser(w http.ResponseWriter, r *http.Request, _ htt
 		return
 	}
 
-	utils.MakeJsonResponse(w, http.StatusOK, tags)
+	utils.MakeJSONResponse(w, http.StatusOK, tags)
 }
 
+// UpdateTag update tag by ID.
 func (h *handler) UpdateTag(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	userID := r.Header.Get("user_id")
 	tagID := ps.ByName("id")
@@ -88,21 +93,21 @@ func (h *handler) UpdateTag(w http.ResponseWriter, r *http.Request, ps httproute
 
 	tag := &dto.TagUpdate{}
 	if err := json.NewDecoder(r.Body).Decode(&tag); err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
 
 	_, err := h.service.Tag.GetTagByID(tagID, userID)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Tag, tagID)
+		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, utils.Tag, tagID)
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
 
 	err = h.service.Tag.UpdateTag(tag, tagID)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDbResponse, "", "")
+		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, "", "")
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
@@ -110,9 +115,10 @@ func (h *handler) UpdateTag(w http.ResponseWriter, r *http.Request, ps httproute
 	resp := make(map[string]string)
 	resp["Updated tag with id"] = tagID
 
-	utils.MakeJsonResponse(w, http.StatusOK, resp)
+	utils.MakeJSONResponse(w, http.StatusOK, resp)
 }
 
+// DeleteTag delete tag by ID.
 func (h *handler) DeleteTag(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	userID := r.Header.Get("user_id")
 	tagID := ps.ByName("id")
@@ -120,14 +126,14 @@ func (h *handler) DeleteTag(w http.ResponseWriter, r *http.Request, ps httproute
 
 	_, err := h.service.Tag.GetTagByID(tagID, userID)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Tag, tagID)
+		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, utils.Tag, tagID)
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
 
 	id, err := h.service.Tag.DeleteTag(tagID, userID)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDbResponse, "", "")
+		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, "", "")
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
@@ -135,5 +141,5 @@ func (h *handler) DeleteTag(w http.ResponseWriter, r *http.Request, ps httproute
 	resp := make(map[string]int)
 	resp["Delete tag with id"] = id
 
-	utils.MakeJsonResponse(w, http.StatusOK, resp)
+	utils.MakeJSONResponse(w, http.StatusOK, resp)
 }

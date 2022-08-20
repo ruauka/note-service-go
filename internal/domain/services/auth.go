@@ -1,39 +1,40 @@
 package services
 
 import (
-	"log"
 	"time"
 
 	"github.com/golang-jwt/jwt"
 
 	"web/internal/adapters/storage"
-	"web/internal/domain/enteties/dto"
 	"web/internal/domain/enteties/model"
 	"web/internal/domain/errors"
 	"web/internal/utils"
 )
 
+// authService auth service struct.
 type authService struct {
 	storage storage.UserAuthStorage
-	// logger
 }
 
+// NewAuthService auth service func builder.
 func NewAuthService(userAuthStorage storage.UserAuthStorage) UserAuthService {
 	return &authService{storage: userAuthStorage}
 }
 
+// RegisterUser create user.
 func (a *authService) RegisterUser(user *model.User) (*model.User, error) {
 	user.Password = utils.GeneratePasswordHash(user.Password)
 	return a.storage.RegisterUser(user)
 }
 
+// GenerateToken generate token for user auth.
 func (a *authService) GenerateToken(userName, password string) (string, error) {
 	user, err := a.storage.GetUserForToken(userName, utils.GeneratePasswordHash(password))
 	if err != nil {
 		return "", err
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, dto.TokenClaims{
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, utils.TokenClaims{
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(utils.ExpDuration).Unix(),
 		},
@@ -42,14 +43,15 @@ func (a *authService) GenerateToken(userName, password string) (string, error) {
 
 	tokenString, err := token.SignedString([]byte(utils.SigningKey))
 	if err != nil {
-		log.Println(err)
+		return "", err
 	}
 
 	return tokenString, nil
 }
 
+// ParseToken check token for auth.
 func (a *authService) ParseToken(accessToken string) (string, error) {
-	token, err := jwt.ParseWithClaims(accessToken, &dto.TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(accessToken, &utils.TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.ErrSigningMethod
 		}
@@ -60,7 +62,7 @@ func (a *authService) ParseToken(accessToken string) (string, error) {
 		return "", err
 	}
 
-	claims, ok := token.Claims.(*dto.TokenClaims)
+	claims, ok := token.Claims.(*utils.TokenClaims)
 	if !ok {
 		return "", errors.ErrClaimsType
 	}

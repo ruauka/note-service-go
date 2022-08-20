@@ -1,3 +1,4 @@
+// Package validate Package validate
 package validate
 
 import (
@@ -6,9 +7,9 @@ import (
 	"web/internal/utils"
 )
 
-// InputJsonValidate - валидация входящей структуры.
-func InputJsonValidate(inputJson interface{}) error {
-	err := utils.Validate.Struct(inputJson)
+// InputJSONValidate input JSON validation.
+func InputJSONValidate(inputJSON interface{}) error {
+	err := utils.Validate.Struct(inputJSON)
 	if err != nil {
 		for _, err := range err.(validator.ValidationErrors) {
 			return err

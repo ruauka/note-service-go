@@ -15,13 +15,62 @@ import (
 	"web/pkg/logger"
 )
 
+// CreateNote create user note.
+func (h *handler) CreateNote(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	userID := r.Header.Get("user_id")
+	ctx := r.Context()
+
+	newNote := &model.Note{}
+	if err := json.NewDecoder(r.Body).Decode(&newNote); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		logger.LogFromContext(ctx).Error(err.Error())
+		return
+	}
+
+	err := validate.InputJSONValidate(newNote)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		logger.LogFromContext(ctx).Error(err.Error())
+		return
+	}
+
+	note, err := h.service.Note.CreateNote(newNote, userID)
+	if err != nil {
+		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, utils.Note, newNote.Title)
+		logger.LogFromContext(ctx).Error(err.Error())
+		return
+	}
+
+	resp := make(map[string]string)
+	resp[fmt.Sprintf("Created note '%s' with id", note.Title)] = note.ID
+
+	utils.MakeJSONResponse(w, http.StatusCreated, resp)
+}
+
+// GetNoteByID get note by ID.
+func (h *handler) GetNoteByID(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	userID := r.Header.Get("user_id")
+	noteID := ps.ByName("id")
+	ctx := r.Context()
+
+	note, err := h.service.Note.GetNoteByID(noteID, userID)
+	if err != nil {
+		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, utils.Note, noteID)
+		logger.LogFromContext(ctx).Error(err.Error())
+		return
+	}
+
+	utils.MakeJSONResponse(w, http.StatusOK, note)
+}
+
+// GetAllNotesByUser get all notes by user.
 func (h *handler) GetAllNotesByUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	userID := r.Header.Get("user_id")
 	ctx := r.Context()
 
 	notes, err := h.service.Note.GetAllNotesByUser(userID)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDbResponse, "", "")
+		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, "", "")
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
@@ -32,55 +81,10 @@ func (h *handler) GetAllNotesByUser(w http.ResponseWriter, r *http.Request, _ ht
 		return
 	}
 
-	utils.MakeJsonResponse(w, http.StatusOK, notes)
+	utils.MakeJSONResponse(w, http.StatusOK, notes)
 }
 
-func (h *handler) GetNoteByID(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	userID := r.Header.Get("user_id")
-	noteID := ps.ByName("id")
-	ctx := r.Context()
-
-	note, err := h.service.Note.GetNoteByID(noteID, userID)
-	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Note, noteID)
-		logger.LogFromContext(ctx).Error(err.Error())
-		return
-	}
-
-	utils.MakeJsonResponse(w, http.StatusOK, note)
-}
-
-func (h *handler) CreateNote(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	userID := r.Header.Get("user_id")
-	ctx := r.Context()
-
-	newNote := &model.Note{}
-	if err := json.NewDecoder(r.Body).Decode(&newNote); err != nil {
-		http.Error(w, err.Error(), 400)
-		logger.LogFromContext(ctx).Error(err.Error())
-		return
-	}
-	// Валидация объекта структуры Note //
-	err := validate.InputJsonValidate(newNote)
-	if err != nil {
-		http.Error(w, err.Error(), 400)
-		logger.LogFromContext(ctx).Error(err.Error())
-		return
-	}
-
-	note, err := h.service.Note.CreateNote(newNote, userID)
-	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Note, newNote.Title)
-		logger.LogFromContext(ctx).Error(err.Error())
-		return
-	}
-
-	resp := make(map[string]string)
-	resp[fmt.Sprintf("Created note '%s' with id", note.Title)] = note.ID
-
-	utils.MakeJsonResponse(w, http.StatusCreated, resp)
-}
-
+// UpdateNote update note by ID.
 func (h *handler) UpdateNote(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	userID := r.Header.Get("user_id")
 	noteID := ps.ByName("id")
@@ -88,21 +92,21 @@ func (h *handler) UpdateNote(w http.ResponseWriter, r *http.Request, ps httprout
 
 	newNote := &dto.NoteUpdate{}
 	if err := json.NewDecoder(r.Body).Decode(&newNote); err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
 
 	_, err := h.service.Note.GetNoteByID(noteID, userID)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Note, noteID)
+		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, utils.Note, noteID)
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
 
 	err = h.service.Note.UpdateNote(newNote, noteID)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDbResponse, "", "")
+		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, "", "")
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
@@ -110,9 +114,10 @@ func (h *handler) UpdateNote(w http.ResponseWriter, r *http.Request, ps httprout
 	resp := make(map[string]string)
 	resp["Updated note with id"] = noteID
 
-	utils.MakeJsonResponse(w, http.StatusOK, resp)
+	utils.MakeJSONResponse(w, http.StatusOK, resp)
 }
 
+// DeleteNote delete note by ID.
 func (h *handler) DeleteNote(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	userID := r.Header.Get("user_id")
 	noteID := ps.ByName("id")
@@ -120,14 +125,14 @@ func (h *handler) DeleteNote(w http.ResponseWriter, r *http.Request, ps httprout
 
 	_, err := h.service.Note.GetNoteByID(noteID, userID)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Note, noteID)
+		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, utils.Note, noteID)
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
 
 	id, err := h.service.Note.DeleteNote(noteID, userID)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDbResponse, "", "")
+		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, "", "")
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
@@ -135,9 +140,10 @@ func (h *handler) DeleteNote(w http.ResponseWriter, r *http.Request, ps httprout
 	resp := make(map[string]int)
 	resp["Deleted note with id"] = id
 
-	utils.MakeJsonResponse(w, http.StatusOK, resp)
+	utils.MakeJSONResponse(w, http.StatusOK, resp)
 }
 
+// SetTags set tags to note.
 func (h *handler) SetTags(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	userID := r.Header.Get("user_id")
 	noteID := ps.ByName("id")
@@ -146,7 +152,7 @@ func (h *handler) SetTags(w http.ResponseWriter, r *http.Request, ps httprouter.
 
 	note, err := h.service.Note.GetNoteByID(noteID, userID)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Note, noteID)
+		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, utils.Note, noteID)
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
@@ -156,16 +162,16 @@ func (h *handler) SetTags(w http.ResponseWriter, r *http.Request, ps httprouter.
 	for _, tagID := range tags["tag"] {
 		tag, err := h.service.Tag.GetTagByID(tagID, userID)
 		if err != nil {
-			utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Tag, tagID)
+			utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, utils.Tag, tagID)
 			logger.LogFromContext(ctx).Error(err.Error())
 			return
 		}
 		tagsMap[tagID] = tag.TagName
 	}
 
-	tagId, err := h.service.Note.SetTags(noteID, tagsMap)
+	tagID, err := h.service.Note.SetTags(noteID, tagsMap)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Tag, tagId)
+		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, utils.Tag, tagID)
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
@@ -173,9 +179,10 @@ func (h *handler) SetTags(w http.ResponseWriter, r *http.Request, ps httprouter.
 	resp := make(map[string]map[string]string)
 	resp[fmt.Sprintf("To note '%s' set tags", note.Title)] = tagsMap
 
-	utils.MakeJsonResponse(w, http.StatusOK, resp)
+	utils.MakeJSONResponse(w, http.StatusOK, resp)
 }
 
+// RemoveTags remove tags from note.
 func (h *handler) RemoveTags(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	userID := r.Header.Get("user_id")
 	noteID := ps.ByName("id")
@@ -184,7 +191,7 @@ func (h *handler) RemoveTags(w http.ResponseWriter, r *http.Request, ps httprout
 
 	note, err := h.service.Note.GetNoteByID(noteID, userID)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Note, noteID)
+		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, utils.Note, noteID)
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
@@ -194,16 +201,16 @@ func (h *handler) RemoveTags(w http.ResponseWriter, r *http.Request, ps httprout
 	for _, tagID := range tags["tag"] {
 		tag, err := h.service.Tag.GetTagByID(tagID, userID)
 		if err != nil {
-			utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Tag, tagID)
+			utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, utils.Tag, tagID)
 			logger.LogFromContext(ctx).Error(err.Error())
 			return
 		}
 		tagsMap[tagID] = tag.TagName
 	}
 
-	tagId, err := h.service.Note.RemoveTags(noteID, tagsMap)
+	tagID, err := h.service.Note.RemoveTags(noteID, tagsMap)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Tag, tagId)
+		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, utils.Tag, tagID)
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
@@ -211,16 +218,17 @@ func (h *handler) RemoveTags(w http.ResponseWriter, r *http.Request, ps httprout
 	resp := make(map[string]map[string]string)
 	resp[fmt.Sprintf("From note '%s' deleted tags", note.Title)] = tagsMap
 
-	utils.MakeJsonResponse(w, http.StatusOK, resp)
+	utils.MakeJSONResponse(w, http.StatusOK, resp)
 }
 
+// GetAllNotesWithTags get all notes with tags by user.
 func (h *handler) GetAllNotesWithTags(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	userID := r.Header.Get("user_id")
 	ctx := r.Context()
 
 	notes, err := h.service.Note.GetAllNotesByUser(userID)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDbResponse, "", "")
+		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, "", "")
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
@@ -233,7 +241,7 @@ func (h *handler) GetAllNotesWithTags(w http.ResponseWriter, r *http.Request, _ 
 
 	notesResp, err := h.service.Note.GetAllNotesWithTags(userID, notes)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDbResponse, "", "")
+		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, "", "")
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
@@ -244,9 +252,10 @@ func (h *handler) GetAllNotesWithTags(w http.ResponseWriter, r *http.Request, _ 
 		return
 	}
 
-	utils.MakeJsonResponse(w, http.StatusOK, notesResp)
+	utils.MakeJSONResponse(w, http.StatusOK, notesResp)
 }
 
+// GetNoteWithAllTags get note by id with all tags by user.
 func (h *handler) GetNoteWithAllTags(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	userID := r.Header.Get("user_id")
 	noteID := ps.ByName("id")
@@ -254,7 +263,7 @@ func (h *handler) GetNoteWithAllTags(w http.ResponseWriter, r *http.Request, ps 
 
 	note, err := h.service.Note.GetNoteByID(noteID, userID)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.Note, noteID)
+		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, utils.Note, noteID)
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
@@ -266,5 +275,5 @@ func (h *handler) GetNoteWithAllTags(w http.ResponseWriter, r *http.Request, ps 
 		return
 	}
 
-	utils.MakeJsonResponse(w, http.StatusOK, noteResp)
+	utils.MakeJSONResponse(w, http.StatusOK, noteResp)
 }

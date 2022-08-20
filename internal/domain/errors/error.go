@@ -1,13 +1,16 @@
+// Package errors Package errors
 package errors
 
 import "errors"
 
+// DB errors.
 var (
-	ErrDbResponse  = errors.New("db response error")
-	ErrDbDuplicate = "duplicate key value violates unique constraint"
-	ErrDbNotExists = "no rows in result set"
+	ErrDBResponse  = errors.New("db response error")
+	ErrDBDuplicate = "duplicate key value violates unique constraint"
+	ErrDBNotExists = "no rows in result set"
 )
 
+// user errors.
 var (
 	ErrUsersListEmpty    = errors.New("no users")
 	ErrEmptyAuthHeader   = errors.New("empty auth header")
@@ -17,12 +20,11 @@ var (
 	ErrClaimsType        = errors.New("token claims are not of type *dto.TokenClaims")
 )
 
+// notes errors.
 var (
 	ErrNotesListEmpty         = errors.New("no notes")
 	ErrNotesListWithTagsEmpty = errors.New("no notes with tags")
 )
 
-var (
-	ErrTagsListEmpty = errors.New("no tags")
-	ErrTagNotExists  = errors.New("tag not exists")
-)
+// ErrTagsListEmpty tags errors.
+var ErrTagsListEmpty = errors.New("no tags")

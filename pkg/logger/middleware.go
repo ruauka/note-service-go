@@ -16,7 +16,7 @@ type LogMiddleware struct {
 	*zap.Logger
 }
 
-// NewLoggerMiddleware returns handler logging for httprouter.
+// NewLoggerMiddleware returns handler logging for http-router.
 func NewLoggerMiddleware(logger *zap.Logger) func(next httprouter.Handle) httprouter.Handle {
 	middleware := LogMiddleware{logger}
 	return middleware.Handler
@@ -35,7 +35,7 @@ func (l LogMiddleware) Handler(next httprouter.Handle) httprouter.Handle {
 		requestID := zap.String("request_id", reqID)
 
 		userLog := l.With(requestID)
-		ctx := context.WithValue(r.Context(), "logger", userLog)
+		ctx := context.WithValue(r.Context(), "logger", userLog) //nolint:staticcheck
 
 		rw := newResponseWriter(w)
 
@@ -60,6 +60,7 @@ func newResponseWriter(w http.ResponseWriter) *responseWriterDelegator {
 	return &responseWriterDelegator{ResponseWriter: w}
 }
 
+// Hook.
 type responseWriterDelegator struct {
 	http.ResponseWriter
 	status      int
@@ -67,12 +68,14 @@ type responseWriterDelegator struct {
 	wroteHeader bool
 }
 
+// WriteHeader Hook.
 func (r *responseWriterDelegator) WriteHeader(code int) {
 	r.status = code
 	r.wroteHeader = true
 	r.ResponseWriter.WriteHeader(code)
 }
 
+// Write Hook.
 func (r *responseWriterDelegator) Write(b []byte) (int, error) {
 	n, err := r.ResponseWriter.Write(b)
 	r.written += int64(n)

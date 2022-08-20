@@ -6,6 +6,7 @@ postgres:
   sslMode: disable
 app:
   port: 8000
+  maxHeaderBytes: 20
   writeTimeout: 10
   readTimeout: 10
 logger:

@@ -1,3 +1,4 @@
+// Package docs Package docs
 package docs
 
 import (
@@ -6,6 +7,7 @@ import (
 	"fmt"
 	"html/template"
 	"io/fs"
+	"log"
 	"net/http"
 	"runtime"
 
@@ -28,6 +30,7 @@ var BuildInfo = buildInfo{
 	GoVersion,
 }
 
+// BuildInfo struct of service description.
 type buildInfo struct {
 	AppName    string `json:"app_name,omitempty"`
 	AppVersion string `json:"app_version,omitempty"`
@@ -36,7 +39,10 @@ type buildInfo struct {
 
 // Print information about the app to stdout.
 func (b *buildInfo) Print() {
-	i, _ := json.MarshalIndent(b, "", "   ")
+	i, err := json.MarshalIndent(b, "", "   ")
+	if err != nil {
+		log.Println(err)
+	}
 	fmt.Printf("Info:\n%v\n\n", string(i))
 }
 
@@ -49,12 +55,12 @@ var apidocs embed.FS
 // OpenapiHandler get dynamic spec for http-server.
 func OpenapiHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	// Copy source template
-	tmpl, _ := template.ParseFS(apidocs, "openapi/openapi.yaml")
-	tmpl.Execute(w, BuildInfo) //nolint:errcheck
+	tmpl, _ := template.ParseFS(apidocs, "openapi/openapi.yaml") //nolint:errcheck
+	tmpl.Execute(w, BuildInfo)                                   //nolint:errcheck,gosec
 }
 
 // NewSwaggerHandler returns Handler for endpoint `/swagger/*`.
 func NewSwaggerHandler() http.FileSystem {
-	fswagger, _ := fs.Sub(swaggerFS, "swagger-ui")
+	fswagger, _ := fs.Sub(swaggerFS, "swagger-ui") //nolint:errcheck
 	return http.FS(fswagger)
 }

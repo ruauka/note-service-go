@@ -1,3 +1,4 @@
+// Package logger Package logger
 package logger
 
 import (
@@ -7,6 +8,7 @@ import (
 	"web/internal/config"
 )
 
+// NewLogger logger func builder.
 func NewLogger(config *config.Config) *zap.Logger {
 	cfg := zap.NewProductionConfig()
 	cfg.Sampling = nil

@@ -1,3 +1,4 @@
+// Package middleware Package middleware
 package middleware
 
 import (
@@ -11,6 +12,7 @@ import (
 	"web/internal/utils"
 )
 
+// CheckToken - handler middleware. Check bearer token for auth.
 func CheckToken(next httprouter.Handle, auth services.UserAuthService) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		header := r.Header.Get("Authorization")
@@ -20,7 +22,7 @@ func CheckToken(next httprouter.Handle, auth services.UserAuthService) httproute
 		}
 
 		headerParts := strings.Split(header, " ")
-		if len(headerParts) != 2 {
+		if len(headerParts) != utils.LenHeaderParts {
 			utils.Abort(r.Context(), w, http.StatusUnauthorized, nil, errors.ErrInvalidAuthHeader, "", "")
 			return
 		}
@@ -35,13 +37,13 @@ func CheckToken(next httprouter.Handle, auth services.UserAuthService) httproute
 			return
 		}
 
-		userId, err := auth.ParseToken(headerParts[1])
+		userID, err := auth.ParseToken(headerParts[1])
 		if err != nil {
 			utils.Abort(r.Context(), w, http.StatusUnauthorized, nil, err, "", "")
 			return
 		}
 
-		r.Header.Set("user_id", userId)
+		r.Header.Set("user_id", userID)
 
 		next(w, r, ps)
 	}

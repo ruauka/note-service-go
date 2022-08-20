@@ -1,5 +1,6 @@
 package model
 
+// User model.
 type User struct {
 	ID       string `json:"id" db:"id"`
 	Username string `json:"username" validate:"required"`

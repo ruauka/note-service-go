@@ -4,6 +4,7 @@ import (
 	"web/internal/server"
 )
 
+// Entry point.
 func main() {
 	server.Execute()
 }

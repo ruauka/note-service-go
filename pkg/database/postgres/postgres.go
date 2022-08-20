@@ -1,3 +1,4 @@
+// Package postgres Package postgres
 package postgres
 
 import (
@@ -8,6 +9,7 @@ import (
 	"web/internal/config"
 )
 
+// NewPostgresConnect create connect with DB.
 func NewPostgresConnect(cfg *config.Config) (*sqlx.DB, error) {
 	db, err := sqlx.Open("postgres", fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
 		cfg.Host, cfg.Postgres.Port, cfg.Username, cfg.DBName, cfg.Password, cfg.SSLMode))

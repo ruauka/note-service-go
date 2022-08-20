@@ -10,14 +10,17 @@ import (
 	"web/internal/utils"
 )
 
+// userStorage user storage struct.
 type userStorage struct {
 	db *sqlx.DB
 }
 
+// NewUserStorage user storage func builder.
 func NewUserStorage(pgDB *sqlx.DB) UserStorage {
 	return &userStorage{db: pgDB}
 }
 
+// GetUserByID get user by id from DB.
 func (u *userStorage) GetUserByID(id string) (*dto.UserResp, error) {
 	var user dto.UserResp
 
@@ -29,6 +32,7 @@ func (u *userStorage) GetUserByID(id string) (*dto.UserResp, error) {
 	return &user, nil
 }
 
+// GetAllUsers get all users from DB.
 func (u *userStorage) GetAllUsers() ([]dto.UserResp, error) {
 	var users []dto.UserResp
 
@@ -40,37 +44,39 @@ func (u *userStorage) GetAllUsers() ([]dto.UserResp, error) {
 	return users, nil
 }
 
-func (u *userStorage) UpdateUser(newUser *dto.UserUpdate, userId string) error {
+// UpdateUser update user by id in DB.
+func (u *userStorage) UpdateUser(newUser *dto.UserUpdate, userID string) error {
 	setValues := make([]string, 0)
 	args := make([]interface{}, 0)
-	argId := 1
+	argID := 1
 
 	if newUser.Username != nil {
-		setValues = append(setValues, fmt.Sprintf("username=$%d", argId))
+		setValues = append(setValues, fmt.Sprintf("username=$%d", argID))
 		args = append(args, *newUser.Username)
-		argId++
+		argID++
 	}
 
 	if newUser.Password != nil {
-		setValues = append(setValues, fmt.Sprintf("password=$%d", argId))
+		setValues = append(setValues, fmt.Sprintf("password=$%d", argID))
 		args = append(args, utils.GeneratePasswordHash(*newUser.Password))
-		argId++
+		argID++
 	}
 
 	setQuery := strings.Join(setValues, ", ")
-	query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d", utils.UsersTable, setQuery, argId)
-	args = append(args, userId)
+	query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d", utils.UsersTable, setQuery, argID)
+	args = append(args, userID)
 
 	_, err := u.db.Exec(query, args...)
 
 	return err
 }
 
-func (u *userStorage) DeleteUser(userId string) (int, error) {
+// DeleteUser delete user by id from DB.
+func (u *userStorage) DeleteUser(userID string) (int, error) {
 	var id int
 
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1 RETURNING id", utils.UsersTable)
-	if err := u.db.QueryRow(query, userId).Scan(&id); err != nil {
+	if err := u.db.QueryRow(query, userID).Scan(&id); err != nil {
 		return 0, err
 	}
 

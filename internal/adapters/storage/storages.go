@@ -1,3 +1,4 @@
+// Package storage Package storage
 package storage
 
 import (
@@ -7,18 +8,21 @@ import (
 	"web/internal/domain/enteties/model"
 )
 
+// UserAuthStorage Auth interface.
 type UserAuthStorage interface {
 	RegisterUser(user *model.User) (*model.User, error)
 	GetUserForToken(userName, password string) (*model.User, error)
 }
 
+// UserStorage User interface.
 type UserStorage interface {
-	GetAllUsers() ([]dto.UserResp, error)
 	GetUserByID(id string) (*dto.UserResp, error)
-	UpdateUser(newUser *dto.UserUpdate, userId string) error
+	GetAllUsers() ([]dto.UserResp, error)
+	UpdateUser(newUser *dto.UserUpdate, userID string) error
 	DeleteUser(id string) (int, error)
 }
 
+// NoteStorage Note interface.
 type NoteStorage interface {
 	CreateNote(note *model.Note, userID string) (*model.Note, error)
 	GetNoteByID(id string, userID string) (*dto.NoteResp, error)
@@ -28,9 +32,10 @@ type NoteStorage interface {
 	SetTags(noteID string, tags map[string]string) (string, error)
 	RemoveTags(noteID string, tags map[string]string) (string, error)
 	GetAllNotesWithTags(userID string, notes []dto.NotesResp) ([]dto.NoteWithTagsResp, error)
-	GetNoteWithAllTags(userID, NoteID string, note *dto.NoteResp) (dto.NoteWithTagsResp, error)
+	GetNoteWithAllTags(userID, noteID string, note *dto.NoteResp) (dto.NoteWithTagsResp, error)
 }
 
+// TagStorage Tag interface.
 type TagStorage interface {
 	CreateTag(tag *model.Tag, userID string) (*model.Tag, error)
 	GetTagByID(tagID, userID string) (*dto.TagResp, error)
@@ -39,6 +44,7 @@ type TagStorage interface {
 	DeleteTag(tagID, userID string) (int, error)
 }
 
+// Storages struct of storages interfaces.
 type Storages struct {
 	Auth UserAuthStorage
 	User UserStorage
@@ -46,6 +52,7 @@ type Storages struct {
 	Tag  TagStorage
 }
 
+// NewStorages storages func builder.
 func NewStorages(pgDB *sqlx.DB) *Storages {
 	return &Storages{
 		Auth: NewAuthStorage(pgDB),

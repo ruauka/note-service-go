@@ -1,3 +1,4 @@
+// Package swagger Package swagger
 package swagger
 
 import (
@@ -6,6 +7,7 @@ import (
 	"web/docs"
 )
 
+// Register register swagger handlers.
 func Register(router *httprouter.Router) {
 	// Get spec for swagger-ui
 	router.GET("/openapi.yaml", docs.OpenapiHandler)

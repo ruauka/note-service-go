@@ -12,14 +12,17 @@ import (
 	"web/internal/utils"
 )
 
+// noteStorage note storage struct.
 type noteStorage struct {
 	db *sqlx.DB
 }
 
+// NewNoteStorage note storage func builder.
 func NewNoteStorage(pgDB *sqlx.DB) NoteStorage {
 	return &noteStorage{db: pgDB}
 }
 
+// CreateNote create note in DB.
 func (n *noteStorage) CreateNote(note *model.Note, userID string) (*model.Note, error) {
 	query := fmt.Sprintf("INSERT INTO %s (title, info, user_id) VALUES ($1, $2, $3) RETURNING id", utils.NotesTable)
 	if err := n.db.QueryRow(query, note.Title, note.Info, userID).Scan(&note.ID); err != nil {
@@ -29,6 +32,7 @@ func (n *noteStorage) CreateNote(note *model.Note, userID string) (*model.Note, 
 	return note, nil
 }
 
+// GetNoteByID get note by id from DB.
 func (n *noteStorage) GetNoteByID(id string, userID string) (*dto.NoteResp, error) {
 	var note dto.NoteResp
 
@@ -40,6 +44,7 @@ func (n *noteStorage) GetNoteByID(id string, userID string) (*dto.NoteResp, erro
 	return &note, nil
 }
 
+// GetAllNotesByUser get all notes by user from DB.
 func (n *noteStorage) GetAllNotesByUser(userID string) ([]dto.NotesResp, error) {
 	var notes []dto.NotesResp
 
@@ -51,25 +56,26 @@ func (n *noteStorage) GetAllNotesByUser(userID string) ([]dto.NotesResp, error) 
 	return notes, nil
 }
 
+// UpdateNote update note by id in DB.
 func (n *noteStorage) UpdateNote(newNote *dto.NoteUpdate, noteID string) error {
 	setValues := make([]string, 0)
 	args := make([]interface{}, 0)
-	argId := 1
+	argID := 1
 
 	if newNote.Info != nil {
-		setValues = append(setValues, fmt.Sprintf("info=$%d", argId))
+		setValues = append(setValues, fmt.Sprintf("info=$%d", argID))
 		args = append(args, *newNote.Info)
-		argId++
+		argID++
 	}
 
 	if newNote.Title != nil {
-		setValues = append(setValues, fmt.Sprintf("title=$%d", argId))
+		setValues = append(setValues, fmt.Sprintf("title=$%d", argID))
 		args = append(args, *newNote.Title)
-		argId++
+		argID++
 	}
 
 	setQuery := strings.Join(setValues, ", ")
-	query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d", utils.NotesTable, setQuery, argId)
+	query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d", utils.NotesTable, setQuery, argID)
 	args = append(args, noteID)
 
 	_, err := n.db.Exec(query, args...)
@@ -77,6 +83,7 @@ func (n *noteStorage) UpdateNote(newNote *dto.NoteUpdate, noteID string) error {
 	return err
 }
 
+// DeleteNote delete note by id from DB.
 func (n *noteStorage) DeleteNote(noteID, userID string) (int, error) {
 	var id int
 
@@ -88,6 +95,7 @@ func (n *noteStorage) DeleteNote(noteID, userID string) (int, error) {
 	return id, nil
 }
 
+// SetTags - set tags to note by ID.
 func (n *noteStorage) SetTags(noteID string, tags map[string]string) (string, error) {
 	for tagID, tagName := range tags {
 		query := fmt.Sprintf("INSERT INTO %s (note_id, tag_id) VALUES ($1, $2)", utils.NotesTagsTable)
@@ -99,6 +107,7 @@ func (n *noteStorage) SetTags(noteID string, tags map[string]string) (string, er
 	return "", nil
 }
 
+// RemoveTags - remove tags from note by ID.
 func (n *noteStorage) RemoveTags(noteID string, tags map[string]string) (string, error) {
 	for tagID, tagName := range tags {
 		query := fmt.Sprintf("DELETE FROM %s WHERE note_id=$1 AND tag_id=$2", utils.NotesTagsTable)
@@ -110,8 +119,9 @@ func (n *noteStorage) RemoveTags(noteID string, tags map[string]string) (string,
 	return "", nil
 }
 
+// GetAllNotesWithTags get all notes with tags by user.
 func (n *noteStorage) GetAllNotesWithTags(userID string, notes []dto.NotesResp) ([]dto.NoteWithTagsResp, error) {
-	tempNotes := make([]dto.NoteWithTagsResp, len(notes), len(notes))
+	tempNotes := make([]dto.NoteWithTagsResp, len(notes))
 	resultNotes := make([]dto.NoteWithTagsResp, 0)
 
 	for index, note := range notes {
@@ -122,9 +132,9 @@ func (n *noteStorage) GetAllNotesWithTags(userID string, notes []dto.NotesResp) 
 			" ON notes_tags.tag_id = tags.id"+
 			" AND tags.user_id = $1 AND notes.id = $2", utils.NotesTable)
 
-		row, err := n.db.Query(query, userID, note.ID)
+		row, err := n.db.Query(query, userID, note.ID) //nolint:rowserrcheck
 		if err != nil {
-			fmt.Println(err)
+			return nil, err
 		}
 
 		for row.Next() {
@@ -152,7 +162,8 @@ func (n *noteStorage) GetAllNotesWithTags(userID string, notes []dto.NotesResp) 
 	return resultNotes, nil
 }
 
-func (n *noteStorage) GetNoteWithAllTags(userID, NoteID string, note *dto.NoteResp) (dto.NoteWithTagsResp, error) {
+// GetNoteWithAllTags get note by id with all tags by user.
+func (n *noteStorage) GetNoteWithAllTags(userID, noteID string, note *dto.NoteResp) (dto.NoteWithTagsResp, error) {
 	var resultNote dto.NoteWithTagsResp
 
 	query := fmt.Sprintf("SELECT notes.id, notes.title, notes.info, tags.id, tags.tagname"+
@@ -162,9 +173,9 @@ func (n *noteStorage) GetNoteWithAllTags(userID, NoteID string, note *dto.NoteRe
 		" ON notes_tags.tag_id = tags.id"+
 		" AND tags.user_id = $1 AND notes.id = $2", utils.NotesTable)
 
-	row, err := n.db.Query(query, userID, NoteID)
+	row, err := n.db.Query(query, userID, noteID) //nolint:rowserrcheck
 	if err != nil {
-		fmt.Println(err)
+		return dto.NoteWithTagsResp{}, err
 	}
 
 	for row.Next() {
@@ -181,7 +192,7 @@ func (n *noteStorage) GetNoteWithAllTags(userID, NoteID string, note *dto.NoteRe
 	}
 
 	if resultNote.ID == "" {
-		return dto.NoteWithTagsResp{}, fmt.Errorf(fmt.Sprintf("Note with id '%s' has no tags", NoteID))
+		return dto.NoteWithTagsResp{}, fmt.Errorf(fmt.Sprintf("Note with id '%s' has no tags", noteID))
 	}
 
 	return resultNote, nil

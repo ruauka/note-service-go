@@ -5,27 +5,32 @@ import (
 	"web/internal/domain/enteties/dto"
 )
 
+// userService user service struct.
 type userService struct {
 	storage storage.UserStorage
-	// logger
 }
 
+// NewUserService user service func builder.
 func NewUserService(userStorage storage.UserStorage) UserService {
 	return &userService{storage: userStorage}
 }
 
-func (u *userService) GetAllUsers() ([]dto.UserResp, error) {
-	return u.storage.GetAllUsers()
-}
-
+// GetUserByID get user by ID.
 func (u *userService) GetUserByID(id string) (*dto.UserResp, error) {
 	return u.storage.GetUserByID(id)
 }
 
-func (u *userService) UpdateUser(newUser *dto.UserUpdate, userId string) error {
-	return u.storage.UpdateUser(newUser, userId)
+// GetAllUsers get all users.
+func (u *userService) GetAllUsers() ([]dto.UserResp, error) {
+	return u.storage.GetAllUsers()
 }
 
+// UpdateUser update user by ID.
+func (u *userService) UpdateUser(newUser *dto.UserUpdate, userID string) error {
+	return u.storage.UpdateUser(newUser, userID)
+}
+
+// DeleteUser delete user by ID.
 func (u *userService) DeleteUser(id string) (int, error) {
 	return u.storage.DeleteUser(id)
 }
