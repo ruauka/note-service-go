@@ -3,6 +3,7 @@ package user
 import (
 	"bytes"
 	e "errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -12,6 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"web/internal/config"
+	"web/internal/domain/enteties/dto"
 	"web/internal/domain/enteties/model"
 	"web/internal/domain/errors"
 	"web/internal/domain/services"
@@ -22,11 +24,11 @@ import (
 
 func TestHandler_RegisterUser(t *testing.T) {
 	// Init mock func obj
-	type mockBehavior func(s *mock_services.MockUserAuthService, user model.User)
+	type mockBehavior func(s *mock_services.MockUserAuthService, user *model.User)
 
 	testTable := []struct {
 		inputJson          string
-		inputUser          model.User
+		inputUser          *model.User
 		mockBehavior       mockBehavior
 		expectedStatusCode int
 		expectedResponse   string
@@ -38,18 +40,18 @@ func TestHandler_RegisterUser(t *testing.T) {
 				"password": "test_password"
 			}`,
 			// service request
-			inputUser: model.User{
+			inputUser: &model.User{
 				Username: "test_name",
 				Password: "test_password",
 			},
-			mockBehavior: func(s *mock_services.MockUserAuthService, user model.User) {
+			mockBehavior: func(s *mock_services.MockUserAuthService, user *model.User) {
 				// service response
-				outputUser := model.User{
+				outputUser := &model.User{
 					ID:       "1",
 					Username: "test_name",
 					Password: "test_password",
 				}
-				s.EXPECT().RegisterUser(&user).Return(&outputUser, nil)
+				s.EXPECT().RegisterUser(user).Return(outputUser, nil)
 			},
 			expectedStatusCode: http.StatusCreated,
 			expectedResponse: `{"Created new user 'test_name' with id":"1"}
@@ -60,8 +62,8 @@ func TestHandler_RegisterUser(t *testing.T) {
 			inputJson: `{
 				"username": "test_name
 			}`,
-			inputUser:          model.User{},
-			mockBehavior:       func(s *mock_services.MockUserAuthService, user model.User) {},
+			inputUser:          &model.User{},
+			mockBehavior:       func(s *mock_services.MockUserAuthService, user *model.User) {},
 			expectedStatusCode: http.StatusBadRequest,
 			expectedResponse: `invalid character '\n' in string literal
 `,
@@ -71,8 +73,8 @@ func TestHandler_RegisterUser(t *testing.T) {
 			inputJson: `{
 				"username": "test_name"
 			}`,
-			inputUser:          model.User{},
-			mockBehavior:       func(s *mock_services.MockUserAuthService, user model.User) {},
+			inputUser:          &model.User{},
+			mockBehavior:       func(s *mock_services.MockUserAuthService, user *model.User) {},
 			expectedStatusCode: http.StatusBadRequest,
 			expectedResponse: `Key: 'User.Password' Error:Field validation for 'Password' failed on the 'required' tag
 `,
@@ -84,14 +86,14 @@ func TestHandler_RegisterUser(t *testing.T) {
 				"password": "test_password"
 			}`,
 			// service request
-			inputUser: model.User{
+			inputUser: &model.User{
 				Username: "test_name",
 				Password: "test_password",
 			},
-			mockBehavior: func(s *mock_services.MockUserAuthService, user model.User) {
+			mockBehavior: func(s *mock_services.MockUserAuthService, user *model.User) {
 				// service response
-				outputUser := model.User{}
-				s.EXPECT().RegisterUser(&user).Return(&outputUser, e.New(errors.ErrDBDuplicate))
+				outputUser := &model.User{}
+				s.EXPECT().RegisterUser(user).Return(outputUser, e.New(errors.ErrDBDuplicate))
 			},
 			expectedStatusCode: http.StatusBadRequest,
 			expectedResponse: `{"error":"user 'test_name' is already exists"}
@@ -104,14 +106,14 @@ func TestHandler_RegisterUser(t *testing.T) {
 				"password": "test_password"
 			}`,
 			// service request
-			inputUser: model.User{
+			inputUser: &model.User{
 				Username: "test_name",
 				Password: "test_password",
 			},
-			mockBehavior: func(s *mock_services.MockUserAuthService, user model.User) {
+			mockBehavior: func(s *mock_services.MockUserAuthService, user *model.User) {
 				// service response
-				outputUser := model.User{}
-				s.EXPECT().RegisterUser(&user).Return(&outputUser, e.New(errors.ErrDBNotExists))
+				outputUser := &model.User{}
+				s.EXPECT().RegisterUser(user).Return(outputUser, e.New(errors.ErrDBNotExists))
 			},
 			expectedStatusCode: http.StatusBadRequest,
 			expectedResponse: `{"error":"No user with name 'test_name'"}
@@ -124,14 +126,14 @@ func TestHandler_RegisterUser(t *testing.T) {
 				"password": "test_password"
 			}`,
 			// service request
-			inputUser: model.User{
+			inputUser: &model.User{
 				Username: "test_name",
 				Password: "test_password",
 			},
-			mockBehavior: func(s *mock_services.MockUserAuthService, user model.User) {
+			mockBehavior: func(s *mock_services.MockUserAuthService, user *model.User) {
 				// service response
-				outputUser := model.User{}
-				s.EXPECT().RegisterUser(&user).Return(&outputUser, e.New("some db Err"))
+				outputUser := &model.User{}
+				s.EXPECT().RegisterUser(user).Return(outputUser, e.New("some db Err"))
 			},
 			expectedStatusCode: http.StatusBadRequest,
 			expectedResponse: `{"desc":"some db Err","error":"db response error"}
@@ -276,6 +278,88 @@ func TestHandler_GenerateToken(t *testing.T) {
 			// Test Request
 			w := httptest.NewRecorder()
 			req := httptest.NewRequest(http.MethodPost, utils.Login, bytes.NewBufferString(testCase.inputJson))
+			// Make Request
+			router.ServeHTTP(w, req)
+			// Assert
+			require.Equal(t, testCase.expectedStatusCode, w.Code)
+			require.Equal(t, testCase.expectedResponse, w.Body.String())
+		})
+	}
+}
+
+func TestHandler_GetUserByID(t *testing.T) {
+	// Init mock func obj
+	type mockBehavior func(s *mock_services.MockUserService, userID string)
+
+	testTable := []struct {
+		userID             string
+		mockBehavior       mockBehavior
+		expectedStatusCode int
+		expectedResponse   string
+		testName           string
+	}{
+		{
+			// service request
+			userID: "1",
+			mockBehavior: func(s *mock_services.MockUserService, userID string) {
+				// service response
+				outputUser := &dto.UserResp{
+					ID:       "1",
+					Username: "test_name",
+				}
+				s.EXPECT().GetUserByID(userID).Return(outputUser, nil)
+			},
+			expectedStatusCode: http.StatusOK,
+			expectedResponse: `{"id":"1","username":"test_name"}
+`,
+			testName: "test-1-Handler: OK",
+		},
+		{
+			// service request
+			userID: "2",
+			mockBehavior: func(s *mock_services.MockUserService, userID string) {
+				// service response
+				s.EXPECT().GetUserByID(userID).Return(nil, e.New(errors.ErrDBNotExists))
+			},
+			expectedStatusCode: http.StatusBadRequest,
+			expectedResponse: `{"error":"No user with id '2'"}
+`,
+			testName: "test-2-Service: User not found",
+		},
+		{
+			// service request
+			userID: "3",
+			mockBehavior: func(s *mock_services.MockUserService, userID string) {
+				// service response
+				s.EXPECT().GetUserByID(userID).Return(nil, e.New("some db Err"))
+			},
+			expectedStatusCode: http.StatusBadRequest,
+			expectedResponse: `{"desc":"some db Err","error":"db response error"}
+`,
+			testName: "test-3-Service: Db resp Err",
+		},
+	}
+
+	for _, testCase := range testTable {
+		t.Run(testCase.testName, func(t *testing.T) {
+			// Init mock controller
+			c := gomock.NewController(t)
+			defer c.Finish()
+			// Init mock service
+			userSrv := mock_services.NewMockUserService(c)
+			testCase.mockBehavior(userSrv, testCase.userID)
+			// Init testing logger with "fatal" level (5)
+			logger := l.NewLogger(&config.Config{Logger: config.Logger{LogLevel: 5}})
+			loggingMiddleware := l.NewLoggerMiddleware(logger)
+			// Init service
+			service := &services.Services{User: userSrv}
+			handler := NewHandler(service, loggingMiddleware)
+			// Test server
+			router := httprouter.New()
+			router.GET(utils.UserURL, handler.LogMiddleware(handler.GetUserByID))
+			// Test Request
+			w := httptest.NewRecorder()
+			req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/users/%s", testCase.userID), nil)
 			// Make Request
 			router.ServeHTTP(w, req)
 			// Assert
