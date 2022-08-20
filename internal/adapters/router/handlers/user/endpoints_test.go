@@ -54,7 +54,7 @@ func TestHandler_RegisterUser(t *testing.T) {
 			expectedStatusCode: http.StatusCreated,
 			expectedResponse: `{"Created new user 'test_name' with id":"1"}
 `,
-			testName: "test-1-OK",
+			testName: "test-1-Handler: OK",
 		},
 		{
 			inputJson: `{
@@ -65,7 +65,7 @@ func TestHandler_RegisterUser(t *testing.T) {
 			expectedStatusCode: http.StatusBadRequest,
 			expectedResponse: `invalid character '\n' in string literal
 `,
-			testName: "test-2-Bad JSON",
+			testName: "test-2-Handler: Bad JSON",
 		},
 		{
 			inputJson: `{
@@ -76,7 +76,7 @@ func TestHandler_RegisterUser(t *testing.T) {
 			expectedStatusCode: http.StatusBadRequest,
 			expectedResponse: `Key: 'User.Password' Error:Field validation for 'Password' failed on the 'required' tag
 `,
-			testName: "test-3-Validation Err",
+			testName: "test-3-Handler: Validation Err",
 		},
 		{
 			inputJson: `{
@@ -96,7 +96,7 @@ func TestHandler_RegisterUser(t *testing.T) {
 			expectedStatusCode: http.StatusBadRequest,
 			expectedResponse: `{"error":"user 'test_name' is already exists"}
 `,
-			testName: "test-4-Service-user is already exists Err",
+			testName: "test-4-Service: User is already exists Err",
 		},
 		{
 			inputJson: `{
@@ -116,7 +116,7 @@ func TestHandler_RegisterUser(t *testing.T) {
 			expectedStatusCode: http.StatusBadRequest,
 			expectedResponse: `{"error":"No user with name 'test_name'"}
 `,
-			testName: "test-5-Service-user not found",
+			testName: "test-5-Service: User not found",
 		},
 		{
 			inputJson: `{
@@ -136,7 +136,7 @@ func TestHandler_RegisterUser(t *testing.T) {
 			expectedStatusCode: http.StatusBadRequest,
 			expectedResponse: `{"desc":"some db Err","error":"db response error"}
 `,
-			testName: "test-6-Service-db resp Err",
+			testName: "test-6-Service: Db resp Err",
 		},
 	}
 
@@ -160,6 +160,122 @@ func TestHandler_RegisterUser(t *testing.T) {
 			// Test Request
 			w := httptest.NewRecorder()
 			req := httptest.NewRequest(http.MethodPost, utils.Register, bytes.NewBufferString(testCase.inputJson))
+			// Make Request
+			router.ServeHTTP(w, req)
+			// Assert
+			require.Equal(t, testCase.expectedStatusCode, w.Code)
+			require.Equal(t, testCase.expectedResponse, w.Body.String())
+		})
+	}
+}
+
+func TestHandler_GenerateToken(t *testing.T) {
+	// Init mock func obj
+	type mockBehavior func(s *mock_services.MockUserAuthService, userName, password string)
+
+	testTable := []struct {
+		inputJson          string
+		userName           string
+		password           string
+		mockBehavior       mockBehavior
+		expectedStatusCode int
+		expectedResponse   string
+		testName           string
+	}{
+		{
+			inputJson: `{
+				"username": "test_name",
+				"password": "test_password"
+			}`,
+			// service request
+			userName: "test_name",
+			password: "test_password",
+			mockBehavior: func(s *mock_services.MockUserAuthService, userName, password string) {
+				// service response
+				outputToken := "generatedToken"
+				s.EXPECT().GenerateToken(userName, password).Return(outputToken, nil)
+			},
+			expectedStatusCode: http.StatusOK,
+			expectedResponse: `{"token":"Bearer generatedToken"}
+`,
+			testName: "test-1-Handler: OK",
+		},
+		{
+			inputJson: `{
+				"username": "test_name
+			}`,
+			mockBehavior:       func(s *mock_services.MockUserAuthService, userName, password string) {},
+			expectedStatusCode: http.StatusBadRequest,
+			expectedResponse: `invalid character '\n' in string literal
+`,
+			testName: "test-2-Handler: Bad JSON",
+		},
+		{
+			inputJson: `{
+						"username": "test_name"
+			}`,
+			mockBehavior:       func(s *mock_services.MockUserAuthService, userName, password string) {},
+			expectedStatusCode: http.StatusBadRequest,
+			expectedResponse: `Key: 'UserAuth.Password' Error:Field validation for 'Password' failed on the 'required' tag
+`,
+			testName: "test-3-Handler: Validation Err",
+		},
+		{
+			inputJson: `{
+				"username": "test_name",
+				"password": "test_password"
+			}`,
+			// service request
+			userName: "test_name",
+			password: "test_password",
+			mockBehavior: func(s *mock_services.MockUserAuthService, userName, password string) {
+				// service response
+				s.EXPECT().GenerateToken(userName, password).Return("", e.New(errors.ErrDbNotExists))
+			},
+			expectedStatusCode: http.StatusBadRequest,
+			expectedResponse: `{"error":"No user with name 'test_name'"}
+`,
+			testName: "test-4-Service: User not found",
+		},
+		{
+			inputJson: `{
+				"username": "test_name",
+				"password": "test_password"
+			}`,
+			// service request
+			userName: "test_name",
+			password: "test_password",
+			mockBehavior: func(s *mock_services.MockUserAuthService, userName, password string) {
+				// service response
+				s.EXPECT().GenerateToken(userName, password).Return("", e.New("some db Err"))
+			},
+			expectedStatusCode: http.StatusBadRequest,
+			expectedResponse: `{"desc":"some db Err","error":"db response error"}
+`,
+			testName: "test-5-Service: Db resp Err",
+		},
+	}
+
+	for _, testCase := range testTable {
+		t.Run(testCase.testName, func(t *testing.T) {
+			// Init mock controller
+			c := gomock.NewController(t)
+			defer c.Finish()
+			// Init mock service
+			auth := mock_services.NewMockUserAuthService(c)
+			testCase.mockBehavior(auth, testCase.userName, testCase.password)
+			// Init testing logger with "fatal" level (5)
+			logger := l.NewLogger(&config.Config{Logger: config.Logger{LogLevel: 5}})
+			loggingMiddleware := l.NewLoggerMiddleware(logger)
+			// Init service
+			service := &services.Services{Auth: auth}
+			handler := NewHandler(service, loggingMiddleware)
+			// Test server
+			router := httprouter.New()
+			router.POST(utils.Login, handler.LogMiddleware(handler.GenerateToken))
+			// Test Request
+			w := httptest.NewRecorder()
+			req := httptest.NewRequest(http.MethodPost, utils.Login, bytes.NewBufferString(testCase.inputJson))
 			// Make Request
 			router.ServeHTTP(w, req)
 			// Assert

@@ -75,6 +75,20 @@ func (h *handler) GenerateToken(w http.ResponseWriter, r *http.Request, _ httpro
 	utils.MakeJsonResponse(w, http.StatusOK, resp)
 }
 
+func (h *handler) GetUserByID(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	userID := ps.ByName("id")
+	ctx := r.Context()
+
+	user, err := h.service.User.GetUserByID(userID)
+	if err != nil {
+		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.User, userID)
+		logger.LogFromContext(ctx).Error(err.Error())
+		return
+	}
+
+	utils.MakeJsonResponse(w, http.StatusOK, user)
+}
+
 func (h *handler) GetAllUsers(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	ctx := r.Context()
 
@@ -92,20 +106,6 @@ func (h *handler) GetAllUsers(w http.ResponseWriter, r *http.Request, _ httprout
 	}
 
 	utils.MakeJsonResponse(w, http.StatusOK, users)
-}
-
-func (h *handler) GetUserByID(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	userID := ps.ByName("id")
-	ctx := r.Context()
-
-	user, err := h.service.User.GetUserByID(userID)
-	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDbResponse, utils.User, userID)
-		logger.LogFromContext(ctx).Error(err.Error())
-		return
-	}
-
-	utils.MakeJsonResponse(w, http.StatusOK, user)
 }
 
 func (h *handler) UpdateUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
