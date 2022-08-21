@@ -92,8 +92,7 @@ func TestHandler_RegisterUser(t *testing.T) {
 			},
 			mockBehavior: func(s *mock_services.MockUserAuthService, user *model.User) {
 				// service response
-				outputUser := &model.User{}
-				s.EXPECT().RegisterUser(user).Return(outputUser, e.New(errors.ErrDBDuplicate))
+				s.EXPECT().RegisterUser(user).Return(nil, e.New(errors.ErrDBDuplicate))
 			},
 			expectedStatusCode: http.StatusBadRequest,
 			expectedResponse: `{"error":"user 'test_name' is already exists"}
@@ -112,33 +111,12 @@ func TestHandler_RegisterUser(t *testing.T) {
 			},
 			mockBehavior: func(s *mock_services.MockUserAuthService, user *model.User) {
 				// service response
-				outputUser := &model.User{}
-				s.EXPECT().RegisterUser(user).Return(outputUser, e.New(errors.ErrDBNotExists))
-			},
-			expectedStatusCode: http.StatusBadRequest,
-			expectedResponse: `{"error":"No user with name 'test_name'"}
-`,
-			testName: "test-5-Service:User not found",
-		},
-		{
-			inputJson: `{
-				"username": "test_name",
-				"password": "test_password"
-			}`,
-			// service request
-			inputUser: &model.User{
-				Username: "test_name",
-				Password: "test_password",
-			},
-			mockBehavior: func(s *mock_services.MockUserAuthService, user *model.User) {
-				// service response
-				outputUser := &model.User{}
-				s.EXPECT().RegisterUser(user).Return(outputUser, e.New("some db Err"))
+				s.EXPECT().RegisterUser(user).Return(nil, e.New("some db Err"))
 			},
 			expectedStatusCode: http.StatusBadRequest,
 			expectedResponse: `{"desc":"some db Err","error":"db response error"}
 `,
-			testName: "test-6-Service:Db resp Err",
+			testName: "test-5-Service:Db resp Err",
 		},
 	}
 

@@ -108,9 +108,15 @@ func TestCheckToken(t *testing.T) {
 			var actualUserID string
 			// Test server
 			router := httprouter.New()
-			router.GET("/protected", handler.LogMiddleware(CheckToken(func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-				actualUserID = r.Header.Get("user_id")
-			}, service.Auth)))
+			router.GET("/protected",
+				handler.LogMiddleware(
+					CheckToken(
+						func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+							actualUserID = r.Header.Get("user_id")
+						},
+						service.Auth),
+				),
+			)
 			// Test Request
 			w := httptest.NewRecorder()
 			req := httptest.NewRequest(http.MethodGet, "/protected", nil)

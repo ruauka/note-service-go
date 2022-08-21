@@ -139,7 +139,7 @@ func (h *handler) DeleteTag(w http.ResponseWriter, r *http.Request, ps httproute
 	}
 
 	resp := make(map[string]int)
-	resp["Delete tag with id"] = id
+	resp["Deleted tag with id"] = id
 
 	utils.MakeJSONResponse(w, http.StatusOK, resp)
 }
