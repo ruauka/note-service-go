@@ -1,6 +1,16 @@
-version: "3"
+version: "3.8"
 
 services:
+  go-service:
+    container_name: go-service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - database
+
   database:
     container_name: database
     image: postgres:latest

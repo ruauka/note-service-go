@@ -1,5 +1,5 @@
 postgres:
-  host: localhost
+  host: database
   port: 5432
   username: pg
   dbName: crud
