@@ -1,6 +1,15 @@
 version: "3.8"
 
 services:
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "80:80"
+    depends_on:
+      - go-service
+
   go-service:
     container_name: go-service
     build:

@@ -1,4 +1,3 @@
-# запуск тестов
 test:
 	go test -cover ./...
 
@@ -7,9 +6,6 @@ lint:
 
 vendor:
 	go mod vendor
-
-bench:
-	go test -bench=BenchmarkExecute -benchmem -benchtime 5s -count=5
 
 migrate-create:
 	migrate create -ext sql -dir ./migrate -seq init
