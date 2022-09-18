@@ -133,7 +133,7 @@ func (h *handler) UpdateUser(w http.ResponseWriter, r *http.Request, ps httprout
 
 	err = h.service.User.UpdateUser(newUser, userID)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, "", "")
+		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, utils.User, *newUser.Username)
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}

@@ -1,1 +1,0 @@
-brew install golang-migrate - утилита для миграций
