@@ -7,6 +7,12 @@ lint:
 vendor:
 	go mod vendor
 
+dockerup:
+	docker-compose up -d --build
+
+dockerstop:
+	docker-compose stop
+
 migrate-create:
 	migrate create -ext sql -dir ./migrate -seq init
 
