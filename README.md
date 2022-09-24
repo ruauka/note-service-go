@@ -10,9 +10,9 @@ JWT token authorization is used here.
 
 The project is made using the principles of clean architecture.
 
-The project consists of 3 microservices and each runs in a container:
+The project consists of 3 microservices and each runs in a container in docker-compose:
 1. Nginx
-2. Go-service itself
+2. Go-service
 3. PostgreSQL
 
 ## First start
