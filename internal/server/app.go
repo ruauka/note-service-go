@@ -15,7 +15,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 
-	"web/docs"
+	"web/api"
 	"web/internal/adapters/router/handlers/note"
 	"web/internal/adapters/router/handlers/tag"
 	"web/internal/adapters/router/handlers/user"
@@ -30,7 +30,7 @@ import (
 // Execute main service func.
 func Execute() {
 	// print service description
-	docs.BuildInfo.Print()
+	api.BuildInfo.Print()
 	// config create
 	cfg := config.GetConfig()
 	// logger create

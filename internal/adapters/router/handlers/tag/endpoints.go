@@ -17,7 +17,7 @@ import (
 )
 
 // CreateTag create tag.
-func (h *handler) CreateTag(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) CreateTag(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	userID := r.Header.Get("user_id")
 	ctx := r.Context()
 
@@ -49,7 +49,7 @@ func (h *handler) CreateTag(w http.ResponseWriter, r *http.Request, _ httprouter
 }
 
 // GetTagByID get tag by ID.
-func (h *handler) GetTagByID(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) GetTagByID(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	userID := r.Header.Get("user_id")
 	tagID := ps.ByName("id")
 	ctx := r.Context()
@@ -65,7 +65,7 @@ func (h *handler) GetTagByID(w http.ResponseWriter, r *http.Request, ps httprout
 }
 
 // GetAllTagsByUser get tag by user.
-func (h *handler) GetAllTagsByUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) GetAllTagsByUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	userID := r.Header.Get("user_id")
 	ctx := r.Context()
 
@@ -86,7 +86,7 @@ func (h *handler) GetAllTagsByUser(w http.ResponseWriter, r *http.Request, _ htt
 }
 
 // UpdateTag update tag by ID.
-func (h *handler) UpdateTag(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) UpdateTag(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	userID := r.Header.Get("user_id")
 	tagID := ps.ByName("id")
 	ctx := r.Context()
@@ -119,7 +119,7 @@ func (h *handler) UpdateTag(w http.ResponseWriter, r *http.Request, ps httproute
 }
 
 // DeleteTag delete tag by ID.
-func (h *handler) DeleteTag(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) DeleteTag(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	userID := r.Header.Get("user_id")
 	tagID := ps.ByName("id")
 	ctx := r.Context()

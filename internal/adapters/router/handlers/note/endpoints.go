@@ -16,7 +16,7 @@ import (
 )
 
 // CreateNote create user note.
-func (h *handler) CreateNote(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) CreateNote(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	userID := r.Header.Get("user_id")
 	ctx := r.Context()
 
@@ -48,7 +48,7 @@ func (h *handler) CreateNote(w http.ResponseWriter, r *http.Request, _ httproute
 }
 
 // GetNoteByID get note by ID.
-func (h *handler) GetNoteByID(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) GetNoteByID(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	userID := r.Header.Get("user_id")
 	noteID := ps.ByName("id")
 	ctx := r.Context()
@@ -64,7 +64,7 @@ func (h *handler) GetNoteByID(w http.ResponseWriter, r *http.Request, ps httprou
 }
 
 // GetAllNotesByUser get all notes by user.
-func (h *handler) GetAllNotesByUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) GetAllNotesByUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	userID := r.Header.Get("user_id")
 	ctx := r.Context()
 
@@ -85,7 +85,7 @@ func (h *handler) GetAllNotesByUser(w http.ResponseWriter, r *http.Request, _ ht
 }
 
 // UpdateNote update note by ID.
-func (h *handler) UpdateNote(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) UpdateNote(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	userID := r.Header.Get("user_id")
 	noteID := ps.ByName("id")
 	ctx := r.Context()
@@ -118,7 +118,7 @@ func (h *handler) UpdateNote(w http.ResponseWriter, r *http.Request, ps httprout
 }
 
 // DeleteNote delete note by ID.
-func (h *handler) DeleteNote(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) DeleteNote(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	userID := r.Header.Get("user_id")
 	noteID := ps.ByName("id")
 	ctx := r.Context()
@@ -144,7 +144,7 @@ func (h *handler) DeleteNote(w http.ResponseWriter, r *http.Request, ps httprout
 }
 
 // SetTags set tags to note.
-func (h *handler) SetTags(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) SetTags(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	userID := r.Header.Get("user_id")
 	noteID := ps.ByName("id")
 	tags := r.URL.Query()
@@ -183,7 +183,7 @@ func (h *handler) SetTags(w http.ResponseWriter, r *http.Request, ps httprouter.
 }
 
 // RemoveTags remove tags from note.
-func (h *handler) RemoveTags(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) RemoveTags(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	userID := r.Header.Get("user_id")
 	noteID := ps.ByName("id")
 	tags := r.URL.Query()
@@ -222,7 +222,7 @@ func (h *handler) RemoveTags(w http.ResponseWriter, r *http.Request, ps httprout
 }
 
 // GetAllNotesWithTags get all notes with tags by user.
-func (h *handler) GetAllNotesWithTags(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) GetAllNotesWithTags(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	userID := r.Header.Get("user_id")
 	ctx := r.Context()
 
@@ -256,7 +256,7 @@ func (h *handler) GetAllNotesWithTags(w http.ResponseWriter, r *http.Request, _ 
 }
 
 // GetNoteWithAllTags get note by id with all tags by user.
-func (h *handler) GetNoteWithAllTags(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) GetNoteWithAllTags(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	userID := r.Header.Get("user_id")
 	noteID := ps.ByName("id")
 	ctx := r.Context()

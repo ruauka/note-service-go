@@ -1,5 +1,5 @@
-// Package docs Package docs
-package docs
+// Package api Package docs
+package api
 
 import (
 	"embed"

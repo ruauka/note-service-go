@@ -17,7 +17,6 @@ type Server struct {
 
 // NewServer server func builder.
 func NewServer(cfg *config.Config, router *httprouter.Router) *Server {
-	//nolint:gosec
 	return &Server{
 		httpServer: &http.Server{
 			Addr:           ":" + cfg.App.Port,

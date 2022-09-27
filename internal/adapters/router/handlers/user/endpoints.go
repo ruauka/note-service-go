@@ -16,7 +16,7 @@ import (
 )
 
 // RegisterUser create user.
-func (h *handler) RegisterUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) RegisterUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	ctx := r.Context()
 
 	newUser := &model.User{}
@@ -47,7 +47,7 @@ func (h *handler) RegisterUser(w http.ResponseWriter, r *http.Request, _ httprou
 }
 
 // GenerateToken generate token for user auth.
-func (h *handler) GenerateToken(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) GenerateToken(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	ctx := r.Context()
 
 	user := dto.UserAuth{}
@@ -78,7 +78,7 @@ func (h *handler) GenerateToken(w http.ResponseWriter, r *http.Request, _ httpro
 }
 
 // GetUserByID get user by ID.
-func (h *handler) GetUserByID(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) GetUserByID(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	userID := ps.ByName("id")
 	ctx := r.Context()
 
@@ -93,7 +93,7 @@ func (h *handler) GetUserByID(w http.ResponseWriter, r *http.Request, ps httprou
 }
 
 // GetAllUsers get all users.
-func (h *handler) GetAllUsers(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) GetAllUsers(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	ctx := r.Context()
 
 	users, err := h.service.User.GetAllUsers()
@@ -113,7 +113,7 @@ func (h *handler) GetAllUsers(w http.ResponseWriter, r *http.Request, _ httprout
 }
 
 // UpdateUser update user by ID.
-func (h *handler) UpdateUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) UpdateUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	userID := ps.ByName("id")
 	ctx := r.Context()
 
@@ -145,7 +145,7 @@ func (h *handler) UpdateUser(w http.ResponseWriter, r *http.Request, ps httprout
 }
 
 // DeleteUser delete user by ID.
-func (h *handler) DeleteUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) DeleteUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	userID := ps.ByName("id")
 	ctx := r.Context()
 

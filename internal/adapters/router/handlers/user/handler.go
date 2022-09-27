@@ -8,15 +8,15 @@ import (
 	"web/internal/utils"
 )
 
-// handler struct.
-type handler struct {
+// Handler struct.
+type Handler struct {
 	service       services.Services
 	LogMiddleware utils.LogMiddleware
 }
 
 // NewHandler func builder.
-func NewHandler(service *services.Services, logFn utils.LogMiddleware) *handler {
-	return &handler{
+func NewHandler(service *services.Services, logFn utils.LogMiddleware) *Handler {
+	return &Handler{
 		service:       *service,
 		LogMiddleware: logFn,
 	}

@@ -35,7 +35,7 @@ func (l LogMiddleware) Handler(next httprouter.Handle) httprouter.Handle {
 		requestID := zap.String("request_id", reqID)
 
 		userLog := l.With(requestID)
-		ctx := context.WithValue(r.Context(), "logger", userLog) //nolint:staticcheck
+		ctx := context.WithValue(r.Context(), "logger", userLog) //nolint:revive,staticcheck
 
 		rw := newResponseWriter(w)
 
