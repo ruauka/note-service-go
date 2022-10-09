@@ -5,7 +5,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	"web/internal/domain/enteties/model"
+	"web/internal/domain/entities/model"
 	"web/internal/utils"
 )
 

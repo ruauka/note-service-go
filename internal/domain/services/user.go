@@ -2,7 +2,7 @@ package services
 
 import (
 	"web/internal/adapters/storage"
-	"web/internal/domain/enteties/dto"
+	"web/internal/domain/entities/dto"
 )
 
 // userService user service struct.

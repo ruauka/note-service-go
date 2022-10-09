@@ -4,8 +4,8 @@ package storage
 import (
 	"github.com/jmoiron/sqlx"
 
-	"web/internal/domain/enteties/dto"
-	"web/internal/domain/enteties/model"
+	"web/internal/domain/entities/dto"
+	"web/internal/domain/entities/model"
 )
 
 // UserAuthStorage Auth interface.

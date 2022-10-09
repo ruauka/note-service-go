@@ -2,8 +2,8 @@ package services
 
 import (
 	"web/internal/adapters/storage"
-	"web/internal/domain/enteties/dto"
-	"web/internal/domain/enteties/model"
+	"web/internal/domain/entities/dto"
+	"web/internal/domain/entities/model"
 )
 
 // tagService tag service struct.

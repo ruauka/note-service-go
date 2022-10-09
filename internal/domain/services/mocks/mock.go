@@ -6,8 +6,8 @@ package mock_services
 
 import (
 	reflect "reflect"
-	dto "web/internal/domain/enteties/dto"
-	model "web/internal/domain/enteties/model"
+	dto "web/internal/domain/entities/dto"
+	model "web/internal/domain/entities/model"
 
 	gomock "github.com/golang/mock/gomock"
 )

@@ -9,8 +9,8 @@ import (
 	"github.com/julienschmidt/httprouter"
 
 	"web/internal/adapters/router/validate"
-	"web/internal/domain/enteties/dto"
-	"web/internal/domain/enteties/model"
+	"web/internal/domain/entities/dto"
+	"web/internal/domain/entities/model"
 	"web/internal/domain/errors"
 	"web/internal/utils"
 	"web/pkg/logger"

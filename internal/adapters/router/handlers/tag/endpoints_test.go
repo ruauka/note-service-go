@@ -13,8 +13,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"web/internal/config"
-	"web/internal/domain/enteties/dto"
-	"web/internal/domain/enteties/model"
+	"web/internal/domain/entities/dto"
+	"web/internal/domain/entities/model"
 	"web/internal/domain/errors"
 	"web/internal/domain/services"
 	"web/internal/domain/services/mocks"

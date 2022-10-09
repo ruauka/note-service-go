@@ -6,7 +6,7 @@ import (
 	"github.com/golang-jwt/jwt"
 
 	"web/internal/adapters/storage"
-	"web/internal/domain/enteties/model"
+	"web/internal/domain/entities/model"
 	"web/internal/domain/errors"
 	"web/internal/utils"
 )
