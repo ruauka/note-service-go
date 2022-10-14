@@ -18,7 +18,7 @@ import (
 	"web/internal/domain/errors"
 	"web/internal/domain/services"
 	"web/internal/domain/services/mocks"
-	"web/internal/utils"
+	"web/internal/utils/dictionary"
 	l "web/pkg/logger"
 )
 
@@ -142,10 +142,10 @@ func TestHandler_CreateNote(t *testing.T) {
 			handler := NewHandler(service, loggingMiddleware)
 			// Test server
 			router := httprouter.New()
-			router.POST(utils.NotesURL, handler.logMiddleware(handler.CreateNote))
+			router.POST(dictionary.NotesURL, handler.logMiddleware(handler.CreateNote))
 			// Test Request
 			w := httptest.NewRecorder()
-			req := httptest.NewRequest(http.MethodPost, utils.NotesURL, bytes.NewBufferString(testCase.inputJson))
+			req := httptest.NewRequest(http.MethodPost, dictionary.NotesURL, bytes.NewBufferString(testCase.inputJson))
 			req.Header.Set(testCase.headerName, testCase.headerValue)
 			// Make Request
 			router.ServeHTTP(w, req)
@@ -233,7 +233,7 @@ func TestHandler_GetNoteByID(t *testing.T) {
 			handler := NewHandler(service, loggingMiddleware)
 			// Test server
 			router := httprouter.New()
-			router.GET(utils.NoteURL, handler.logMiddleware(handler.GetNoteByID))
+			router.GET(dictionary.NoteURL, handler.logMiddleware(handler.GetNoteByID))
 			// Test Request
 			w := httptest.NewRecorder()
 			req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/notes/%s", testCase.inputNote), nil)
@@ -323,10 +323,10 @@ func TestHandler_GetAllNotesByUser(t *testing.T) {
 			handler := NewHandler(service, loggingMiddleware)
 			// Test server
 			router := httprouter.New()
-			router.GET(utils.NotesURL, handler.logMiddleware(handler.GetAllNotesByUser))
+			router.GET(dictionary.NotesURL, handler.logMiddleware(handler.GetAllNotesByUser))
 			// Test Request
 			w := httptest.NewRecorder()
-			req := httptest.NewRequest(http.MethodGet, utils.NotesURL, nil)
+			req := httptest.NewRequest(http.MethodGet, dictionary.NotesURL, nil)
 			req.Header.Set(testCase.headerName, testCase.headerValue)
 			// Make Request
 			router.ServeHTTP(w, req)
@@ -450,7 +450,7 @@ func TestHandler_UpdateNote(t *testing.T) {
 			handler := NewHandler(service, loggingMiddleware)
 			// Test server
 			router := httprouter.New()
-			router.PUT(utils.NoteURL, handler.logMiddleware(handler.UpdateNote))
+			router.PUT(dictionary.NoteURL, handler.logMiddleware(handler.UpdateNote))
 			// Test Request
 			w := httptest.NewRecorder()
 			req := httptest.NewRequest(http.MethodPut, fmt.Sprintf("/notes/%s", testCase.noteID), bytes.NewBufferString(testCase.inputJson))
@@ -539,7 +539,7 @@ func TestHandler_DeleteNote(t *testing.T) {
 			handler := NewHandler(service, loggingMiddleware)
 			// Test server
 			router := httprouter.New()
-			router.DELETE(utils.NoteURL, handler.logMiddleware(handler.DeleteNote))
+			router.DELETE(dictionary.NoteURL, handler.logMiddleware(handler.DeleteNote))
 			// Test Request
 			w := httptest.NewRecorder()
 			req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/notes/%s", testCase.inputNote), nil)

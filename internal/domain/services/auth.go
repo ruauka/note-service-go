@@ -8,7 +8,8 @@ import (
 	"web/internal/adapters/storage"
 	"web/internal/domain/entities/model"
 	"web/internal/domain/errors"
-	"web/internal/utils"
+	"web/internal/utils/dictionary"
+	"web/internal/utils/functions"
 )
 
 // authService auth service struct.
@@ -23,25 +24,25 @@ func NewAuthService(userAuthStorage storage.UserAuthStorage) UserAuthService {
 
 // RegisterUser create user.
 func (a *authService) RegisterUser(user *model.User) (*model.User, error) {
-	user.Password = utils.GeneratePasswordHash(user.Password)
+	user.Password = functions.GeneratePasswordHash(user.Password)
 	return a.storage.RegisterUser(user)
 }
 
 // GenerateToken generate token for user auth.
 func (a *authService) GenerateToken(userName, password string) (string, error) {
-	user, err := a.storage.GetUserForToken(userName, utils.GeneratePasswordHash(password))
+	user, err := a.storage.GetUserForToken(userName, functions.GeneratePasswordHash(password))
 	if err != nil {
 		return "", err
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, utils.TokenClaims{
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, dictionary.TokenClaims{
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(utils.ExpDuration).Unix(),
+			ExpiresAt: time.Now().Add(dictionary.ExpDuration).Unix(),
 		},
 		UserID: user.ID,
 	})
 
-	tokenString, err := token.SignedString([]byte(utils.SigningKey))
+	tokenString, err := token.SignedString([]byte(dictionary.SigningKey))
 	if err != nil {
 		return "", err
 	}
@@ -51,18 +52,18 @@ func (a *authService) GenerateToken(userName, password string) (string, error) {
 
 // ParseToken check token for auth.
 func (a *authService) ParseToken(accessToken string) (string, error) {
-	token, err := jwt.ParseWithClaims(accessToken, &utils.TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(accessToken, &dictionary.TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.ErrSigningMethod
 		}
-		return []byte(utils.SigningKey), nil
+		return []byte(dictionary.SigningKey), nil
 	})
 
 	if err != nil {
 		return "", err
 	}
 
-	claims, ok := token.Claims.(*utils.TokenClaims)
+	claims, ok := token.Claims.(*dictionary.TokenClaims)
 	if !ok {
 		return "", errors.ErrClaimsType
 	}

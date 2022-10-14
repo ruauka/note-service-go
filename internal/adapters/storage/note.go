@@ -9,7 +9,7 @@ import (
 
 	"web/internal/domain/entities/dto"
 	"web/internal/domain/entities/model"
-	"web/internal/utils"
+	"web/internal/utils/dictionary"
 )
 
 // noteStorage note storage struct.
@@ -24,7 +24,7 @@ func NewNoteStorage(pgDB *sqlx.DB) NoteStorage {
 
 // CreateNote create note in DB.
 func (n *noteStorage) CreateNote(note *model.Note, userID string) (*model.Note, error) {
-	query := fmt.Sprintf("INSERT INTO %s (title, info, user_id) VALUES ($1, $2, $3) RETURNING id", utils.NotesTable)
+	query := fmt.Sprintf("INSERT INTO %s (title, info, user_id) VALUES ($1, $2, $3) RETURNING id", dictionary.NotesTable)
 	if err := n.db.QueryRow(query, note.Title, note.Info, userID).Scan(&note.ID); err != nil {
 		return nil, err
 	}
@@ -36,7 +36,7 @@ func (n *noteStorage) CreateNote(note *model.Note, userID string) (*model.Note, 
 func (n *noteStorage) GetNoteByID(id string, userID string) (*dto.NoteResp, error) {
 	var note dto.NoteResp
 
-	query := fmt.Sprintf("SELECT title, info FROM %s WHERE id=$1 AND user_id=$2", utils.NotesTable)
+	query := fmt.Sprintf("SELECT title, info FROM %s WHERE id=$1 AND user_id=$2", dictionary.NotesTable)
 	if err := n.db.Get(&note, query, id, userID); err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func (n *noteStorage) GetNoteByID(id string, userID string) (*dto.NoteResp, erro
 func (n *noteStorage) GetAllNotesByUser(userID string) ([]dto.NotesResp, error) {
 	var notes []dto.NotesResp
 
-	query := fmt.Sprintf("SELECT id, title, info FROM %s WHERE user_id=$1", utils.NotesTable)
+	query := fmt.Sprintf("SELECT id, title, info FROM %s WHERE user_id=$1", dictionary.NotesTable)
 	if err := n.db.Select(&notes, query, userID); err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (n *noteStorage) UpdateNote(newNote *dto.NoteUpdate, noteID string) error {
 	}
 
 	setQuery := strings.Join(setValues, ", ")
-	query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d", utils.NotesTable, setQuery, argID)
+	query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d", dictionary.NotesTable, setQuery, argID)
 	args = append(args, noteID)
 
 	_, err := n.db.Exec(query, args...)
@@ -87,7 +87,7 @@ func (n *noteStorage) UpdateNote(newNote *dto.NoteUpdate, noteID string) error {
 func (n *noteStorage) DeleteNote(noteID, userID string) (int, error) {
 	var id int
 
-	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1 AND user_id=$2 RETURNING id", utils.NotesTable)
+	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1 AND user_id=$2 RETURNING id", dictionary.NotesTable)
 	if err := n.db.QueryRow(query, noteID, userID).Scan(&id); err != nil {
 		return 0, err
 	}
@@ -98,7 +98,7 @@ func (n *noteStorage) DeleteNote(noteID, userID string) (int, error) {
 // SetTags - set tags to note by ID.
 func (n *noteStorage) SetTags(noteID string, tags map[string]string) (string, error) {
 	for tagID, tagName := range tags {
-		query := fmt.Sprintf("INSERT INTO %s (note_id, tag_id) VALUES ($1, $2)", utils.NotesTagsTable)
+		query := fmt.Sprintf("INSERT INTO %s (note_id, tag_id) VALUES ($1, $2)", dictionary.NotesTagsTable)
 		if res := n.db.QueryRow(query, noteID, tagID); res.Err() != nil {
 			return tagName, res.Err()
 		}
@@ -110,7 +110,7 @@ func (n *noteStorage) SetTags(noteID string, tags map[string]string) (string, er
 // RemoveTags - remove tags from note by ID.
 func (n *noteStorage) RemoveTags(noteID string, tags map[string]string) (string, error) {
 	for tagID, tagName := range tags {
-		query := fmt.Sprintf("DELETE FROM %s WHERE note_id=$1 AND tag_id=$2", utils.NotesTagsTable)
+		query := fmt.Sprintf("DELETE FROM %s WHERE note_id=$1 AND tag_id=$2", dictionary.NotesTagsTable)
 		if res := n.db.QueryRow(query, noteID, tagID); res.Err() != nil {
 			return tagName, res.Err()
 		}
@@ -130,7 +130,7 @@ func (n *noteStorage) GetAllNotesWithTags(userID string, notes []dto.NotesResp) 
 			" ON notes.id = notes_tags.note_id"+
 			" JOIN tags"+
 			" ON notes_tags.tag_id = tags.id"+
-			" AND tags.user_id = $1 AND notes.id = $2", utils.NotesTable)
+			" AND tags.user_id = $1 AND notes.id = $2", dictionary.NotesTable)
 
 		row, err := n.db.Query(query, userID, note.ID) //nolint:rowserrcheck
 		if err != nil {
@@ -171,7 +171,7 @@ func (n *noteStorage) GetNoteWithAllTags(userID, noteID string, note *dto.NoteRe
 		" ON notes.id = notes_tags.note_id"+
 		" JOIN tags"+
 		" ON notes_tags.tag_id = tags.id"+
-		" AND tags.user_id = $1 AND notes.id = $2", utils.NotesTable)
+		" AND tags.user_id = $1 AND notes.id = $2", dictionary.NotesTable)
 
 	row, err := n.db.Query(query, userID, noteID) //nolint:rowserrcheck
 	if err != nil {

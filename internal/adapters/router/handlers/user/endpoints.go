@@ -11,7 +11,8 @@ import (
 	"web/internal/domain/entities/dto"
 	"web/internal/domain/entities/model"
 	"web/internal/domain/errors"
-	"web/internal/utils"
+	"web/internal/utils/dictionary"
+	"web/internal/utils/functions"
 	"web/pkg/logger"
 )
 
@@ -35,7 +36,7 @@ func (h *Handler) RegisterUser(w http.ResponseWriter, r *http.Request, _ httprou
 
 	user, err := h.service.Auth.RegisterUser(newUser)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, utils.User, newUser.Username)
+		functions.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, dictionary.User, newUser.Username)
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
@@ -43,7 +44,7 @@ func (h *Handler) RegisterUser(w http.ResponseWriter, r *http.Request, _ httprou
 	resp := make(map[string]string)
 	resp[fmt.Sprintf("Created new user '%s' with id", user.Username)] = user.ID
 
-	utils.MakeJSONResponse(w, http.StatusCreated, resp)
+	functions.MakeJSONResponse(w, http.StatusCreated, resp)
 }
 
 // GenerateToken generate token for user auth.
@@ -66,7 +67,7 @@ func (h *Handler) GenerateToken(w http.ResponseWriter, r *http.Request, _ httpro
 
 	token, err := h.service.Auth.GenerateToken(user.Username, user.Password)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, utils.User, user.Username)
+		functions.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, dictionary.User, user.Username)
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
@@ -74,7 +75,7 @@ func (h *Handler) GenerateToken(w http.ResponseWriter, r *http.Request, _ httpro
 	resp := make(map[string]string)
 	resp["token"] = fmt.Sprintf("Bearer %s", token)
 
-	utils.MakeJSONResponse(w, http.StatusOK, resp)
+	functions.MakeJSONResponse(w, http.StatusOK, resp)
 }
 
 // GetUserByID get user by ID.
@@ -84,12 +85,12 @@ func (h *Handler) GetUserByID(w http.ResponseWriter, r *http.Request, ps httprou
 
 	user, err := h.service.User.GetUserByID(userID)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, utils.User, userID)
+		functions.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, dictionary.User, userID)
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
 
-	utils.MakeJSONResponse(w, http.StatusOK, user)
+	functions.MakeJSONResponse(w, http.StatusOK, user)
 }
 
 // GetAllUsers get all users.
@@ -98,18 +99,18 @@ func (h *Handler) GetAllUsers(w http.ResponseWriter, r *http.Request, _ httprout
 
 	users, err := h.service.User.GetAllUsers()
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, "", "")
+		functions.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, "", "")
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
 
 	if len(users) == 0 {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrUsersListEmpty, "", "")
+		functions.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrUsersListEmpty, "", "")
 		logger.LogFromContext(ctx).Error(errors.ErrUsersListEmpty.Error())
 		return
 	}
 
-	utils.MakeJSONResponse(w, http.StatusOK, users)
+	functions.MakeJSONResponse(w, http.StatusOK, users)
 }
 
 // UpdateUser update user by ID.
@@ -126,14 +127,14 @@ func (h *Handler) UpdateUser(w http.ResponseWriter, r *http.Request, ps httprout
 
 	_, err := h.service.User.GetUserByID(userID)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, utils.User, userID)
+		functions.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, dictionary.User, userID)
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
 
 	err = h.service.User.UpdateUser(newUser, userID)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, utils.User, *newUser.Username)
+		functions.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, dictionary.User, *newUser.Username)
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
@@ -141,7 +142,7 @@ func (h *Handler) UpdateUser(w http.ResponseWriter, r *http.Request, ps httprout
 	resp := make(map[string]string)
 	resp["Updated user with id"] = userID
 
-	utils.MakeJSONResponse(w, http.StatusOK, resp)
+	functions.MakeJSONResponse(w, http.StatusOK, resp)
 }
 
 // DeleteUser delete user by ID.
@@ -151,14 +152,14 @@ func (h *Handler) DeleteUser(w http.ResponseWriter, r *http.Request, ps httprout
 
 	_, err := h.service.User.GetUserByID(userID)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, utils.User, userID)
+		functions.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, dictionary.User, userID)
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
 
 	id, err := h.service.User.DeleteUser(userID)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, "", "")
+		functions.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, "", "")
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
@@ -166,5 +167,5 @@ func (h *Handler) DeleteUser(w http.ResponseWriter, r *http.Request, ps httprout
 	resp := make(map[string]int)
 	resp["Deleted user with id"] = id
 
-	utils.MakeJSONResponse(w, http.StatusOK, resp)
+	functions.MakeJSONResponse(w, http.StatusOK, resp)
 }

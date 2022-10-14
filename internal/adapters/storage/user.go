@@ -7,7 +7,8 @@ import (
 	"github.com/jmoiron/sqlx"
 
 	"web/internal/domain/entities/dto"
-	"web/internal/utils"
+	"web/internal/utils/dictionary"
+	"web/internal/utils/functions"
 )
 
 // userStorage user storage struct.
@@ -24,7 +25,7 @@ func NewUserStorage(pgDB *sqlx.DB) UserStorage {
 func (u *userStorage) GetUserByID(id string) (*dto.UserResp, error) {
 	var user dto.UserResp
 
-	query := fmt.Sprintf("SELECT id, username FROM %s WHERE id=$1", utils.UsersTable)
+	query := fmt.Sprintf("SELECT id, username FROM %s WHERE id=$1", dictionary.UsersTable)
 	if err := u.db.Get(&user, query, id); err != nil {
 		return nil, err
 	}
@@ -36,7 +37,7 @@ func (u *userStorage) GetUserByID(id string) (*dto.UserResp, error) {
 func (u *userStorage) GetAllUsers() ([]dto.UserResp, error) {
 	var users []dto.UserResp
 
-	query := fmt.Sprintf("SELECT id, username FROM %s", utils.UsersTable)
+	query := fmt.Sprintf("SELECT id, username FROM %s", dictionary.UsersTable)
 	if err := u.db.Select(&users, query); err != nil {
 		return nil, err
 	}
@@ -58,12 +59,12 @@ func (u *userStorage) UpdateUser(newUser *dto.UserUpdate, userID string) error {
 
 	if newUser.Password != nil {
 		setValues = append(setValues, fmt.Sprintf("password=$%d", argID))
-		args = append(args, utils.GeneratePasswordHash(*newUser.Password))
+		args = append(args, functions.GeneratePasswordHash(*newUser.Password))
 		argID++
 	}
 
 	setQuery := strings.Join(setValues, ", ")
-	query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d", utils.UsersTable, setQuery, argID)
+	query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d", dictionary.UsersTable, setQuery, argID)
 	args = append(args, userID)
 
 	_, err := u.db.Exec(query, args...)
@@ -75,7 +76,7 @@ func (u *userStorage) UpdateUser(newUser *dto.UserUpdate, userID string) error {
 func (u *userStorage) DeleteUser(userID string) (int, error) {
 	var id int
 
-	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1 RETURNING id", utils.UsersTable)
+	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1 RETURNING id", dictionary.UsersTable)
 	if err := u.db.QueryRow(query, userID).Scan(&id); err != nil {
 		return 0, err
 	}

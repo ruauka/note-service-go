@@ -12,7 +12,8 @@ import (
 	"web/internal/domain/entities/dto"
 	"web/internal/domain/entities/model"
 	"web/internal/domain/errors"
-	"web/internal/utils"
+	"web/internal/utils/dictionary"
+	"web/internal/utils/functions"
 	"web/pkg/logger"
 )
 
@@ -37,7 +38,7 @@ func (h *Handler) CreateTag(w http.ResponseWriter, r *http.Request, _ httprouter
 
 	tag, err := h.service.Tag.CreateTag(newTag, userID)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, utils.Tag, newTag.TagName)
+		functions.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, dictionary.Tag, newTag.TagName)
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
@@ -45,7 +46,7 @@ func (h *Handler) CreateTag(w http.ResponseWriter, r *http.Request, _ httprouter
 	resp := make(map[string]string)
 	resp[fmt.Sprintf("Created tag '%s' with id", tag.TagName)] = tag.ID
 
-	utils.MakeJSONResponse(w, http.StatusCreated, resp)
+	functions.MakeJSONResponse(w, http.StatusCreated, resp)
 }
 
 // GetTagByID get tag by ID.
@@ -56,12 +57,12 @@ func (h *Handler) GetTagByID(w http.ResponseWriter, r *http.Request, ps httprout
 
 	tag, err := h.service.Tag.GetTagByID(tagID, userID)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, utils.Tag, tagID)
+		functions.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, dictionary.Tag, tagID)
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
 
-	utils.MakeJSONResponse(w, http.StatusOK, tag)
+	functions.MakeJSONResponse(w, http.StatusOK, tag)
 }
 
 // GetAllTagsByUser get tag by user.
@@ -71,18 +72,18 @@ func (h *Handler) GetAllTagsByUser(w http.ResponseWriter, r *http.Request, _ htt
 
 	tags, err := h.service.Tag.GetAllTagsByUser(userID)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, "", "")
+		functions.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, "", "")
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
 
 	if len(tags) == 0 {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrTagsListEmpty, "", "")
+		functions.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrTagsListEmpty, "", "")
 		logger.LogFromContext(ctx).Error(errors.ErrTagsListEmpty.Error())
 		return
 	}
 
-	utils.MakeJSONResponse(w, http.StatusOK, tags)
+	functions.MakeJSONResponse(w, http.StatusOK, tags)
 }
 
 // UpdateTag update tag by ID.
@@ -100,14 +101,14 @@ func (h *Handler) UpdateTag(w http.ResponseWriter, r *http.Request, ps httproute
 
 	_, err := h.service.Tag.GetTagByID(tagID, userID)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, utils.Tag, tagID)
+		functions.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, dictionary.Tag, tagID)
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
 
 	err = h.service.Tag.UpdateTag(tag, tagID)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, "", "")
+		functions.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, "", "")
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
@@ -115,7 +116,7 @@ func (h *Handler) UpdateTag(w http.ResponseWriter, r *http.Request, ps httproute
 	resp := make(map[string]string)
 	resp["Updated tag with id"] = tagID
 
-	utils.MakeJSONResponse(w, http.StatusOK, resp)
+	functions.MakeJSONResponse(w, http.StatusOK, resp)
 }
 
 // DeleteTag delete tag by ID.
@@ -126,14 +127,14 @@ func (h *Handler) DeleteTag(w http.ResponseWriter, r *http.Request, ps httproute
 
 	_, err := h.service.Tag.GetTagByID(tagID, userID)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, utils.Tag, tagID)
+		functions.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, dictionary.Tag, tagID)
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
 
 	id, err := h.service.Tag.DeleteTag(tagID, userID)
 	if err != nil {
-		utils.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, "", "")
+		functions.Abort(ctx, w, http.StatusBadRequest, err, errors.ErrDBResponse, "", "")
 		logger.LogFromContext(ctx).Error(err.Error())
 		return
 	}
@@ -141,5 +142,5 @@ func (h *Handler) DeleteTag(w http.ResponseWriter, r *http.Request, ps httproute
 	resp := make(map[string]int)
 	resp["Deleted tag with id"] = id
 
-	utils.MakeJSONResponse(w, http.StatusOK, resp)
+	functions.MakeJSONResponse(w, http.StatusOK, resp)
 }

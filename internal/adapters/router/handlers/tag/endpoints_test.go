@@ -18,7 +18,7 @@ import (
 	"web/internal/domain/errors"
 	"web/internal/domain/services"
 	"web/internal/domain/services/mocks"
-	"web/internal/utils"
+	"web/internal/utils/dictionary"
 	l "web/pkg/logger"
 )
 
@@ -135,10 +135,10 @@ func TestHandler_CreateTag(t *testing.T) {
 			handler := NewHandler(service, loggingMiddleware)
 			// Test server
 			router := httprouter.New()
-			router.POST(utils.TagsURL, handler.logMiddleware(handler.CreateTag))
+			router.POST(dictionary.TagsURL, handler.logMiddleware(handler.CreateTag))
 			// Test Request
 			w := httptest.NewRecorder()
-			req := httptest.NewRequest(http.MethodPost, utils.TagsURL, bytes.NewBufferString(testCase.inputJson))
+			req := httptest.NewRequest(http.MethodPost, dictionary.TagsURL, bytes.NewBufferString(testCase.inputJson))
 			req.Header.Set(testCase.headerName, testCase.headerValue)
 			// Make Request
 			router.ServeHTTP(w, req)
@@ -225,7 +225,7 @@ func TestHandler_GetTagByID(t *testing.T) {
 			handler := NewHandler(service, loggingMiddleware)
 			// Test server
 			router := httprouter.New()
-			router.GET(utils.TagURL, handler.logMiddleware(handler.GetTagByID))
+			router.GET(dictionary.TagURL, handler.logMiddleware(handler.GetTagByID))
 			// Test Request
 			w := httptest.NewRecorder()
 			req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/tags/%s", testCase.inputTag), nil)
@@ -318,10 +318,10 @@ func TestHandler_GetAllTagsByUser(t *testing.T) {
 			handler := NewHandler(service, loggingMiddleware)
 			// Test server
 			router := httprouter.New()
-			router.GET(utils.TagsURL, handler.logMiddleware(handler.GetAllTagsByUser))
+			router.GET(dictionary.TagsURL, handler.logMiddleware(handler.GetAllTagsByUser))
 			// Test Request
 			w := httptest.NewRecorder()
-			req := httptest.NewRequest(http.MethodGet, utils.TagsURL, nil)
+			req := httptest.NewRequest(http.MethodGet, dictionary.TagsURL, nil)
 			req.Header.Set(testCase.headerName, testCase.headerValue)
 			// Make Request
 			router.ServeHTTP(w, req)
@@ -439,7 +439,7 @@ func TestHandler_UpdateTag(t *testing.T) {
 			handler := NewHandler(service, loggingMiddleware)
 			// Test server
 			router := httprouter.New()
-			router.PUT(utils.TagURL, handler.logMiddleware(handler.UpdateTag))
+			router.PUT(dictionary.TagURL, handler.logMiddleware(handler.UpdateTag))
 			// Test Request
 			w := httptest.NewRecorder()
 			req := httptest.NewRequest(http.MethodPut, fmt.Sprintf("/tags/%s", testCase.tagID), bytes.NewBufferString(testCase.inputJson))
@@ -528,7 +528,7 @@ func TestHandler_DeleteTag(t *testing.T) {
 			handler := NewHandler(service, loggingMiddleware)
 			// Test server
 			router := httprouter.New()
-			router.DELETE(utils.TagURL, handler.logMiddleware(handler.DeleteTag))
+			router.DELETE(dictionary.TagURL, handler.logMiddleware(handler.DeleteTag))
 			// Test Request
 			w := httptest.NewRecorder()
 			req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/tags/%s", testCase.inputTag), nil)

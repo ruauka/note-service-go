@@ -18,7 +18,7 @@ import (
 	"web/internal/domain/errors"
 	"web/internal/domain/services"
 	"web/internal/domain/services/mocks"
-	"web/internal/utils"
+	"web/internal/utils/dictionary"
 	l "web/pkg/logger"
 )
 
@@ -136,10 +136,10 @@ func TestHandler_RegisterUser(t *testing.T) {
 			handler := NewHandler(service, loggingMiddleware)
 			// Test server
 			router := httprouter.New()
-			router.POST(utils.Register, handler.LogMiddleware(handler.RegisterUser))
+			router.POST(dictionary.Register, handler.LogMiddleware(handler.RegisterUser))
 			// Test Request
 			w := httptest.NewRecorder()
-			req := httptest.NewRequest(http.MethodPost, utils.Register, bytes.NewBufferString(testCase.inputJson))
+			req := httptest.NewRequest(http.MethodPost, dictionary.Register, bytes.NewBufferString(testCase.inputJson))
 			// Make Request
 			router.ServeHTTP(w, req)
 			// Assert
@@ -252,10 +252,10 @@ func TestHandler_GenerateToken(t *testing.T) {
 			handler := NewHandler(service, loggingMiddleware)
 			// Test server
 			router := httprouter.New()
-			router.POST(utils.Login, handler.LogMiddleware(handler.GenerateToken))
+			router.POST(dictionary.Login, handler.LogMiddleware(handler.GenerateToken))
 			// Test Request
 			w := httptest.NewRecorder()
-			req := httptest.NewRequest(http.MethodPost, utils.Login, bytes.NewBufferString(testCase.inputJson))
+			req := httptest.NewRequest(http.MethodPost, dictionary.Login, bytes.NewBufferString(testCase.inputJson))
 			// Make Request
 			router.ServeHTTP(w, req)
 			// Assert
@@ -334,7 +334,7 @@ func TestHandler_GetUserByID(t *testing.T) {
 			handler := NewHandler(service, loggingMiddleware)
 			// Test server
 			router := httprouter.New()
-			router.GET(utils.UserURL, handler.LogMiddleware(handler.GetUserByID))
+			router.GET(dictionary.UserURL, handler.LogMiddleware(handler.GetUserByID))
 			// Test Request
 			w := httptest.NewRecorder()
 			req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/users/%s", testCase.userID), nil)
@@ -415,10 +415,10 @@ func TestHandler_GetAllUsers(t *testing.T) {
 			handler := NewHandler(service, loggingMiddleware)
 			// Test server
 			router := httprouter.New()
-			router.GET(utils.UsersURL, handler.LogMiddleware(handler.GetAllUsers))
+			router.GET(dictionary.UsersURL, handler.LogMiddleware(handler.GetAllUsers))
 			// Test Request
 			w := httptest.NewRecorder()
-			req := httptest.NewRequest(http.MethodGet, utils.UsersURL, nil)
+			req := httptest.NewRequest(http.MethodGet, dictionary.UsersURL, nil)
 			// Make Request
 			router.ServeHTTP(w, req)
 			// Assert
@@ -526,7 +526,7 @@ func TestHandler_UpdateUser(t *testing.T) {
 			handler := NewHandler(service, loggingMiddleware)
 			// Test server
 			router := httprouter.New()
-			router.PUT(utils.UserURL, handler.LogMiddleware(handler.UpdateUser))
+			router.PUT(dictionary.UserURL, handler.LogMiddleware(handler.UpdateUser))
 			// Test Request
 			w := httptest.NewRecorder()
 			req := httptest.NewRequest(http.MethodPut, fmt.Sprintf("/users/%s", testCase.userID), bytes.NewBufferString(testCase.inputJson))
@@ -606,7 +606,7 @@ func TestHandler_DeleteUser(t *testing.T) {
 			handler := NewHandler(service, loggingMiddleware)
 			// Test server
 			router := httprouter.New()
-			router.DELETE(utils.UserURL, handler.LogMiddleware(handler.DeleteUser))
+			router.DELETE(dictionary.UserURL, handler.LogMiddleware(handler.DeleteUser))
 			// Test Request
 			w := httptest.NewRecorder()
 			req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("/users/%s", testCase.userID), nil)

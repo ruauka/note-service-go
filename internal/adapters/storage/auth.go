@@ -6,7 +6,7 @@ import (
 	"github.com/jmoiron/sqlx"
 
 	"web/internal/domain/entities/model"
-	"web/internal/utils"
+	"web/internal/utils/dictionary"
 )
 
 // userAuthStorage auth storage struct.
@@ -21,7 +21,7 @@ func NewAuthStorage(pgDB *sqlx.DB) UserAuthStorage {
 
 // RegisterUser insert user in DB.
 func (s *userAuthStorage) RegisterUser(user *model.User) (*model.User, error) {
-	query := fmt.Sprintf("INSERT INTO %s (username, password) VALUES ($1, $2) RETURNING id", utils.UsersTable)
+	query := fmt.Sprintf("INSERT INTO %s (username, password) VALUES ($1, $2) RETURNING id", dictionary.UsersTable)
 	if err := s.db.QueryRow(query, user.Username, user.Password).Scan(&user.ID); err != nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ func (s *userAuthStorage) RegisterUser(user *model.User) (*model.User, error) {
 func (s *userAuthStorage) GetUserForToken(userName, passwordHash string) (*model.User, error) {
 	var user model.User
 
-	query := fmt.Sprintf("SELECT id FROM %s WHERE username=$1 AND password=$2", utils.UsersTable)
+	query := fmt.Sprintf("SELECT id FROM %s WHERE username=$1 AND password=$2", dictionary.UsersTable)
 	err := s.db.Get(&user, query, userName, passwordHash)
 
 	return &user, err
