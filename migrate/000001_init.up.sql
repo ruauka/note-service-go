@@ -1,11 +1,11 @@
-CREATE TABLE users
+CREATE TABLE IF NOT EXISTS users
 (
     id       serial PRIMARY KEY,
     username varchar(255) UNIQUE NOT NULL,
     password varchar(255)        NOT NULL
 );
 
-CREATE TABLE notes
+CREATE TABLE IF NOT EXISTS notes
 (
     id      serial PRIMARY KEY,
     title   varchar(255) UNIQUE                             NOT NULL,
@@ -13,14 +13,14 @@ CREATE TABLE notes
     user_id integer REFERENCES users (id) ON DELETE CASCADE NOT NULL
 );
 
-CREATE TABLE tags
+CREATE TABLE IF NOT EXISTS tags
 (
     id      serial PRIMARY KEY,
     tagname varchar(255)                                    NOT NULL,
     user_id integer REFERENCES users (id) ON DELETE CASCADE NOT NULL
 );
 
-CREATE TABLE notes_tags
+CREATE TABLE IF NOT EXISTS notes_tags
 (
     note_id integer REFERENCES notes (id) ON DELETE CASCADE,
     tag_id  integer REFERENCES tags (id) ON DELETE CASCADE,

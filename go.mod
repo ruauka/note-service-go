@@ -11,6 +11,7 @@ require (
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/lib/pq v1.10.6
+	github.com/mattn/go-sqlite3 v1.14.15
 	github.com/stretchr/testify v1.7.0
 	go.uber.org/zap v1.21.0
 )
