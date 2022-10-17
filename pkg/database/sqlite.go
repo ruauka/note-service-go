@@ -1,5 +1,4 @@
-// Package sqlite Package sqlite
-package sqlite
+package database
 
 import (
 	"log"
@@ -7,12 +6,13 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
-	// import for sqlite3.
+
+	// import sqlite driver.
 	_ "github.com/mattn/go-sqlite3"
 )
 
-// NewDBTestConn - create connect with SQLite for mock DB tests. Db in memory.
-func NewDBTestConn() *sqlx.DB {
+// NewSQLiteConnect - create connect with SQLite for mock DB tests. Db in memory.
+func NewSQLiteConnect() *sqlx.DB {
 	db, err := sqlx.Open("sqlite3", ":memory:?cache=shared&_pragma=foreign_keys(1)")
 	if err != nil {
 		log.Fatalln(err)

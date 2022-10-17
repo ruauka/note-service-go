@@ -1,5 +1,5 @@
-// Package postgres Package postgres
-package postgres
+// Package database Package database
+package database
 
 import (
 	"fmt"

@@ -18,8 +18,8 @@ type noteStorage struct {
 }
 
 // NewNoteStorage note storage func builder.
-func NewNoteStorage(pgDB *sqlx.DB) NoteStorage {
-	return &noteStorage{db: pgDB}
+func NewNoteStorage(db *sqlx.DB) NoteStorage {
+	return &noteStorage{db: db}
 }
 
 // CreateNote create note in DB.

@@ -15,8 +15,8 @@ type userAuthStorage struct {
 }
 
 // NewAuthStorage auth storage func builder.
-func NewAuthStorage(pgDB *sqlx.DB) UserAuthStorage {
-	return &userAuthStorage{db: pgDB}
+func NewAuthStorage(db *sqlx.DB) UserAuthStorage {
+	return &userAuthStorage{db: db}
 }
 
 // RegisterUser insert user in DB.

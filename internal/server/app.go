@@ -11,7 +11,8 @@ import (
 	"syscall"
 	"time"
 
-	_ "github.com/lib/pq" //nolint:revive,nolintlint
+	// import postgres driver.
+	_ "github.com/lib/pq"
 
 	"github.com/julienschmidt/httprouter"
 
@@ -23,7 +24,7 @@ import (
 	s "web/internal/adapters/storage"
 	"web/internal/config"
 	"web/internal/domain/services"
-	"web/pkg/database/postgres"
+	"web/pkg/database"
 	l "web/pkg/logger"
 )
 
@@ -37,7 +38,7 @@ func Execute() {
 	logger := l.NewLogger(cfg)
 	loggingMiddleware := l.NewLoggerMiddleware(logger)
 	// conn to DB create
-	db, err := postgres.NewPostgresConnect(cfg)
+	db, err := database.NewPostgresConnect(cfg)
 	if err != nil {
 		logger.Fatal(fmt.Sprintf("failed to init db: %s", err.Error()))
 	}

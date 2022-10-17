@@ -17,8 +17,8 @@ type userStorage struct {
 }
 
 // NewUserStorage user storage func builder.
-func NewUserStorage(pgDB *sqlx.DB) UserStorage {
-	return &userStorage{db: pgDB}
+func NewUserStorage(db *sqlx.DB) UserStorage {
+	return &userStorage{db: db}
 }
 
 // GetUserByID get user by id from DB.

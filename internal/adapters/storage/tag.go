@@ -17,8 +17,8 @@ type tagStorage struct {
 }
 
 // NewTagStorage tag storage func builder.
-func NewTagStorage(pgDB *sqlx.DB) TagStorage {
-	return &tagStorage{db: pgDB}
+func NewTagStorage(db *sqlx.DB) TagStorage {
+	return &tagStorage{db: db}
 }
 
 // CreateTag create tag in DB.

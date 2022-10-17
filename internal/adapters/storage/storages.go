@@ -53,11 +53,11 @@ type Storages struct {
 }
 
 // NewStorages storages func builder.
-func NewStorages(pgDB *sqlx.DB) *Storages {
+func NewStorages(db *sqlx.DB) *Storages {
 	return &Storages{
-		Auth: NewAuthStorage(pgDB),
-		User: NewUserStorage(pgDB),
-		Note: NewNoteStorage(pgDB),
-		Tag:  NewTagStorage(pgDB),
+		Auth: NewAuthStorage(db),
+		User: NewUserStorage(db),
+		Note: NewNoteStorage(db),
+		Tag:  NewTagStorage(db),
 	}
 }

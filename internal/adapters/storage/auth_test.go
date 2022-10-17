@@ -7,15 +7,15 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"web/internal/domain/entities/model"
-	"web/pkg/database/sqlite"
+	"web/pkg/database"
 )
 
 func TestUserAuthStorage_RegisterUser(t *testing.T) {
-	db := sqlite.NewDBTestConn()
+	db := database.NewSQLiteConnect()
 	defer db.Close()
 
-	up := sqlite.FileOpen("../../../migrate/000001_init.up.sql")
-	down := sqlite.FileOpen("../../../migrate/000001_init.down.sql")
+	up := database.FileOpen("../../../migrate/000001_init.up.sql")
+	down := database.FileOpen("../../../migrate/000001_init.down.sql")
 
 	testTable := []struct {
 		user, expected *model.User
@@ -49,12 +49,12 @@ func TestUserAuthStorage_RegisterUser(t *testing.T) {
 
 	for _, testCase := range testTable {
 		t.Run(testCase.testName, func(t *testing.T) {
-			sqlite.SetUp(db, up)
-			defer sqlite.TearDown(db, down)
+			database.SetUp(db, up)
+			defer database.TearDown(db, down)
 
-			store := NewAuthStorage(db)
+			storage := NewAuthStorage(db)
 
-			actual, err := store.RegisterUser(testCase.user)
+			actual, err := storage.RegisterUser(testCase.user)
 			if err != nil {
 				fmt.Println(err.Error())
 			}
