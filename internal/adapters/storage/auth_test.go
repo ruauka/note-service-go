@@ -50,7 +50,7 @@ func TestUserAuthStorage_RegisterUser(t *testing.T) {
 			db.SetUp()
 			defer db.TearDown()
 
-			storage := NewAuthStorage(db.GetDB())
+			storage := NewAuthStorage(db.Client)
 
 			actual, err := storage.RegisterUser(testCase.user)
 			if err != nil {
@@ -100,7 +100,7 @@ func TestUserAuthStorage_GetUserForToken(t *testing.T) {
 			db.SetUp()
 			defer db.TearDown()
 
-			storage := NewAuthStorage(db.GetDB())
+			storage := NewAuthStorage(db.Client)
 
 			if err := db.UserInsert(testCase.user); err != nil {
 				log.Fatalln(err.Error())

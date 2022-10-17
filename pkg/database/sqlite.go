@@ -15,15 +15,15 @@ import (
 	"web/internal/utils/dictionary"
 )
 
-// TestDBClient - db client for unit testing.
+// TestDBClient - db Client for unit testing.
 type TestDBClient struct {
-	client *sqlx.DB
+	Client *sqlx.DB
 }
 
-// NewTestDBClient - db client builder.
+// NewTestDBClient - db Client builder.
 func NewTestDBClient() *TestDBClient {
 	return &TestDBClient{
-		client: NewSQLiteConnect(),
+		Client: NewSQLiteConnect(),
 	}
 }
 
@@ -37,32 +37,27 @@ func NewSQLiteConnect() *sqlx.DB {
 	return db
 }
 
-// GetDB - get db client field for test storage init.
-func (t TestDBClient) GetDB() *sqlx.DB {
-	return t.client
-}
-
-// Close - close db connect in unit tests.
-func (t TestDBClient) Close() {
-	t.client.Close() //nolint:errcheck,gosec
-}
-
 // SetUp - create a new migrates before tests.
 func (t TestDBClient) SetUp() {
 	schema := fileOpen("../../../migrate/000001_init.up.sql")
-	t.client.MustExec(strings.ReplaceAll(schema, "serial", "INTEGER"))
+	t.Client.MustExec(strings.ReplaceAll(schema, "serial", "INTEGER"))
 }
 
 // TearDown - drop down db after test.
 func (t TestDBClient) TearDown() {
 	schema := fileOpen("../../../migrate/000001_init.down.sql")
-	t.client.MustExec(schema)
+	t.Client.MustExec(schema)
+}
+
+// Close - close db connect in unit tests.
+func (t TestDBClient) Close() {
+	t.Client.Close() //nolint:errcheck,gosec
 }
 
 // UserInsert - insert user in DB.
 func (t TestDBClient) UserInsert(user *model.User) error {
 	query := fmt.Sprintf("INSERT INTO %s (username, password) VALUES ($1, $2) RETURNING id", dictionary.UsersTable)
-	if err := t.client.QueryRow(query, user.Username, user.Password).Scan(&user.ID); err != nil {
+	if err := t.Client.QueryRow(query, user.Username, user.Password).Scan(&user.ID); err != nil {
 		return err
 	}
 
