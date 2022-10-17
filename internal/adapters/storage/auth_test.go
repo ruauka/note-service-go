@@ -1,7 +1,7 @@
 package storage
 
 import (
-	"fmt"
+	"log"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -11,14 +11,12 @@ import (
 )
 
 func TestUserAuthStorage_RegisterUser(t *testing.T) {
-	db := database.NewSQLiteConnect()
+	db := database.NewTestDBClient()
 	defer db.Close()
-
-	up := database.FileOpen("../../../migrate/000001_init.up.sql")
-	down := database.FileOpen("../../../migrate/000001_init.down.sql")
 
 	testTable := []struct {
 		user, expected *model.User
+		err            error
 		testName       string
 	}{
 		{
@@ -49,17 +47,72 @@ func TestUserAuthStorage_RegisterUser(t *testing.T) {
 
 	for _, testCase := range testTable {
 		t.Run(testCase.testName, func(t *testing.T) {
-			database.SetUp(db, up)
-			defer database.TearDown(db, down)
+			db.SetUp()
+			defer db.TearDown()
 
-			storage := NewAuthStorage(db)
+			storage := NewAuthStorage(db.GetDB())
 
 			actual, err := storage.RegisterUser(testCase.user)
 			if err != nil {
-				fmt.Println(err.Error())
+				log.Fatalln(err.Error())
 			}
 
 			require.Equal(t, testCase.expected, actual)
+			require.NoError(t, testCase.err, err)
+		})
+	}
+}
+
+func TestUserAuthStorage_GetUserForToken(t *testing.T) {
+	db := database.NewTestDBClient()
+	defer db.Close()
+
+	testTable := []struct {
+		user     *model.User
+		expected *model.User
+		err      error
+		testName string
+	}{
+		{
+			user: &model.User{
+				Username: "test_name",
+				Password: "test_password_hash",
+			},
+			expected: &model.User{
+				ID: "1",
+			},
+			testName: "Test-1-OK",
+		},
+		{
+			user: &model.User{
+				Username: "test_name1",
+				Password: "test_password_hash1",
+			},
+			expected: &model.User{
+				ID: "1",
+			},
+			testName: "Test-2-OK",
+		},
+	}
+
+	for _, testCase := range testTable {
+		t.Run(testCase.testName, func(t *testing.T) {
+			db.SetUp()
+			defer db.TearDown()
+
+			storage := NewAuthStorage(db.GetDB())
+
+			if err := db.UserInsert(testCase.user); err != nil {
+				log.Fatalln(err.Error())
+			}
+
+			actual, err := storage.GetUserForToken(testCase.user.Username, testCase.user.Password)
+			if err != nil {
+				log.Fatalln(err.Error())
+			}
+
+			require.Equal(t, testCase.expected, actual)
+			require.NoError(t, testCase.err, err)
 		})
 	}
 }
