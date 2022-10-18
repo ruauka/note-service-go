@@ -100,11 +100,11 @@ func TestUserAuthStorage_GetUserForToken(t *testing.T) {
 			db.SetUp()
 			defer db.TearDown()
 
-			storage := NewAuthStorage(db.Client)
-
 			if err := db.InsertTestUser(testCase.user); err != nil {
 				log.Fatalln(err.Error())
 			}
+
+			storage := NewAuthStorage(db.Client)
 
 			actual, err := storage.GetUserForToken(testCase.user.Username, testCase.user.Password)
 			if err != nil {

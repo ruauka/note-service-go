@@ -29,7 +29,7 @@ func NewTestDBClient() *TestDBClient {
 
 // NewSQLiteConnect - create connect with SQLite for mock DB tests. Db in memory.
 func NewSQLiteConnect() *sqlx.DB {
-	db, err := sqlx.Open("sqlite3", ":memory:?cache=shared&_pragma=foreign_keys(1)")
+	db, err := sqlx.Open("sqlite3", "file::memory:?cache=shared&_pragma=foreign_keys(1)")
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -58,6 +58,26 @@ func (t TestDBClient) Close() {
 func (t TestDBClient) InsertTestUser(user *model.User) error {
 	query := fmt.Sprintf("INSERT INTO %s (username, password) VALUES ($1, $2) RETURNING id", dictionary.UsersTable)
 	if err := t.Client.QueryRow(query, user.Username, user.Password).Scan(&user.ID); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// InsertTestNote - insert user in DB.
+func (t TestDBClient) InsertTestNote(note *model.Note, userID string) error {
+	query := fmt.Sprintf("INSERT INTO %s (title, info, user_id) VALUES ($1, $2, $3) RETURNING id", dictionary.NotesTable)
+	if err := t.Client.QueryRow(query, note.Title, note.Info, userID).Scan(&note.ID); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// InsertTestTag - insert user in DB.
+func (t TestDBClient) InsertTestTag(tag *model.Tag, userID string) error {
+	query := fmt.Sprintf("INSERT INTO %s (tagname, user_id) VALUES ($1, $2) RETURNING id", dictionary.TagsTable)
+	if err := t.Client.QueryRow(query, tag.TagName, userID).Scan(&tag.ID); err != nil {
 		return err
 	}
 

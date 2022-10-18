@@ -1,5 +1,8 @@
 test:
-	go test -cover ./...
+	@go test -cover ./... -coverprofile cover.out
+	@echo "-------------------------------------------------------------------------------------"
+	@go tool cover -func cover.out
+	@echo "-------------------------------------------------------------------------------------"
 
 lint:
 	@golangci-lint run

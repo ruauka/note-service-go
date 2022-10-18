@@ -42,11 +42,11 @@ func TestUserStorage_GetUserByID(t *testing.T) {
 			db.SetUp()
 			defer db.TearDown()
 
-			storage := NewUserStorage(db.Client)
-
 			if err := db.InsertTestUser(testCase.user); err != nil {
 				log.Fatalln(err.Error())
 			}
+
+			storage := NewUserStorage(db.Client)
 
 			actual, err := storage.GetUserByID(testCase.userID)
 			if err != nil {
@@ -90,11 +90,11 @@ func TestUserStorage_GetAllUsers(t *testing.T) {
 			db.SetUp()
 			defer db.TearDown()
 
-			storage := NewUserStorage(db.Client)
-
 			if err := db.InsertTestUser(testCase.user); err != nil {
 				log.Fatalln(err.Error())
 			}
+
+			storage := NewUserStorage(db.Client)
 
 			actual, err := storage.GetAllUsers()
 			if err != nil {
@@ -141,11 +141,11 @@ func TestUserStorage_UpdateUser(t *testing.T) {
 			db.SetUp()
 			defer db.TearDown()
 
-			storage := NewUserStorage(db.Client)
-
 			if err := db.InsertTestUser(testCase.user); err != nil {
 				log.Fatalln(err.Error())
 			}
+
+			storage := NewUserStorage(db.Client)
 
 			actual := storage.UpdateUser(testCase.newUser, testCase.userID)
 
@@ -182,11 +182,11 @@ func TestUserStorage_DeleteUser(t *testing.T) {
 			db.SetUp()
 			defer db.TearDown()
 
-			storage := NewUserStorage(db.Client)
-
 			if err := db.InsertTestUser(testCase.user); err != nil {
 				log.Fatalln(err.Error())
 			}
+
+			storage := NewUserStorage(db.Client)
 
 			actual, err := storage.DeleteUser(testCase.userID)
 			if err != nil {
