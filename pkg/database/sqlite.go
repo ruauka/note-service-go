@@ -54,8 +54,8 @@ func (t TestDBClient) Close() {
 	t.Client.Close() //nolint:errcheck,gosec
 }
 
-// UserInsert - insert user in DB.
-func (t TestDBClient) UserInsert(user *model.User) error {
+// InsertTestUser - insert user in DB.
+func (t TestDBClient) InsertTestUser(user *model.User) error {
 	query := fmt.Sprintf("INSERT INTO %s (username, password) VALUES ($1, $2) RETURNING id", dictionary.UsersTable)
 	if err := t.Client.QueryRow(query, user.Username, user.Password).Scan(&user.ID); err != nil {
 		return err

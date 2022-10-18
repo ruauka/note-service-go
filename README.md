@@ -68,7 +68,7 @@ To run the check, run the command in the terminal:
 make lint
 ```
 
-## Er diagram
+## ER Diagram
 <p align="left">
     <img src="assets/er.png" width="700">
 </p>

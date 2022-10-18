@@ -68,8 +68,8 @@ func TestUserAuthStorage_GetUserForToken(t *testing.T) {
 	defer db.Close()
 
 	testTable := []struct {
-		user     *model.User
-		expected *model.User
+		user, expected *model.User
+
 		err      error
 		testName string
 	}{
@@ -102,7 +102,7 @@ func TestUserAuthStorage_GetUserForToken(t *testing.T) {
 
 			storage := NewAuthStorage(db.Client)
 
-			if err := db.UserInsert(testCase.user); err != nil {
+			if err := db.InsertTestUser(testCase.user); err != nil {
 				log.Fatalln(err.Error())
 			}
 
