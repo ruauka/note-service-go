@@ -10,13 +10,14 @@ JWT token authorization is used here.
 
 The project is made using the principles of clean architecture.
 
-The project consists of 3 microservices and each runs in a container in docker-compose:
+The project consists of 4 microservices and each runs in a container in docker-compose:
 1. Nginx
 2. Go-service
 3. PostgreSQL
+4. Migrations
 
 ## Start
-To start the service run the command in the terminal. This command will launch all the services containers (Nginx, Service, Postgres) and make db migrations:
+To start the service run the command in the terminal. This command will launch all the services containers (nginx, service, postgres) and make db migrations with container "migrations" :
 ```bash
 make dockerup
 ```

@@ -39,13 +39,13 @@ func NewSQLiteConnect() *sqlx.DB {
 
 // SetUp - create a new migrates before tests.
 func (t TestDBClient) SetUp() {
-	schema := fileOpen("../../../migrate/000001_init.up.sql")
+	schema := fileOpen("../../../migrations/000001_init.up.sql")
 	t.Client.MustExec(strings.ReplaceAll(schema, "serial", "INTEGER"))
 }
 
 // TearDown - drop down db after test.
 func (t TestDBClient) TearDown() {
-	schema := fileOpen("../../../migrate/000001_init.down.sql")
+	schema := fileOpen("../../../migrations/000001_init.down.sql")
 	t.Client.MustExec(schema)
 }
 
