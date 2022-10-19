@@ -15,28 +15,22 @@ The project consists of 3 microservices and each runs in a container in docker-c
 2. Go-service
 3. PostgreSQL
 
-## First start
-For the initial launch of the service, you must run the command in the terminal:
+## Start
+To start the service run the command in the terminal. This command will launch all the services containers (Nginx, Service, Postgres) and make db migrations:
 ```bash
 make dockerup
 ```
 
-After launching all the service containers (Nginx, service, Postgres), it is necessary to migrate
-the Postgres database to create tables. MacOS users need to run a command in the terminal to install this software:
-```bash
-brew install golang-migrate
-```
-To migrate the database, run the command:
-```bash
-make migrate-up
-```
-
-To stop the service, run the command:
+To stop, run the command:
 ```bash
 make dockerstop
 ```
 
 ## DB Migrations
+For manual migration settings MacOS users need to run a command in the terminal to install this software:
+```bash
+brew install golang-migrate
+```
 Creating migration files:
 ```bash
 make migrate-create

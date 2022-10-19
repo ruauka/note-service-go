@@ -21,5 +21,9 @@ func NewPostgresConnect(cfg *config.Config) (*sqlx.DB, error) {
 		return nil, err
 	}
 
+	// make db migrations
+	schema := fileOpen("./migrate/000001_init.up.sql")
+	db.MustExec(schema)
+
 	return db, nil
 }
