@@ -12,7 +12,5 @@ until psql postgresql://pg:pass@database:5432/crud; do
   sleep 1
 done
 
-migrate -path ./migrate -database 'postgres://pg:pass@database:5432/crud?sslmode=disable' up
-
 >&2 echo "Postgres is up - executing command"
 exec $cmd

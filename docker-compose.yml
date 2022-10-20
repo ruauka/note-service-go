@@ -35,15 +35,16 @@ services:
     volumes:
       - db:/var/lib/postgresql/data
 
-  migrate:
-    container_name: migrations
-    image: migrate/migrate
-    command:
-      [ "-path", "/migrations", "-database",  "postgres://pg:pass@database:5432/crud?sslmode=disable", "up" ]
-    depends_on:
-      - database
-    volumes:
-      - ./migrations:/migrations
+# method for starting database migrations from a container
+#  migrations:
+#    container_name: migrations
+#    image: migrate/migrate
+#    command:
+#      [ "-path", "/migrations", "-database",  "postgres://pg:pass@database:5432/crud?sslmode=disable", "up" ]
+#    depends_on:
+#      - database
+#    volumes:
+#      - ./migrations:/migrations
 
 volumes:
   db:

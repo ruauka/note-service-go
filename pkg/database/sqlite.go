@@ -54,7 +54,7 @@ func (t TestDBClient) Close() {
 	t.Client.Close() //nolint:errcheck,gosec
 }
 
-// InsertTestUser - insert user in DB.
+// InsertTestUser - insert test user in DB.
 func (t TestDBClient) InsertTestUser(user *model.User) error {
 	query := fmt.Sprintf("INSERT INTO %s (username, password) VALUES ($1, $2) RETURNING id", dictionary.UsersTable)
 	if err := t.Client.QueryRow(query, user.Username, user.Password).Scan(&user.ID); err != nil {
@@ -64,7 +64,7 @@ func (t TestDBClient) InsertTestUser(user *model.User) error {
 	return nil
 }
 
-// InsertTestNote - insert user in DB.
+// InsertTestNote - insert test note in DB.
 func (t TestDBClient) InsertTestNote(note *model.Note, userID string) error {
 	query := fmt.Sprintf("INSERT INTO %s (title, info, user_id) VALUES ($1, $2, $3) RETURNING id", dictionary.NotesTable)
 	if err := t.Client.QueryRow(query, note.Title, note.Info, userID).Scan(&note.ID); err != nil {
@@ -74,7 +74,7 @@ func (t TestDBClient) InsertTestNote(note *model.Note, userID string) error {
 	return nil
 }
 
-// InsertTestTag - insert user in DB.
+// InsertTestTag - insert test tag in DB.
 func (t TestDBClient) InsertTestTag(tag *model.Tag, userID string) error {
 	query := fmt.Sprintf("INSERT INTO %s (tagname, user_id) VALUES ($1, $2) RETURNING id", dictionary.TagsTable)
 	if err := t.Client.QueryRow(query, tag.TagName, userID).Scan(&tag.ID); err != nil {
