@@ -1,11 +1,9 @@
-FROM golang:1.17.7
-
+FROM golang:1.17.7 AS builder
 WORKDIR /app
 
 COPY go.mod .
 COPY go.sum .
 RUN go mod download
-
 COPY . .
 
 ## install psql
@@ -15,6 +13,9 @@ COPY . .
 ## make wait-for-postgres.sh executable
 #RUN chmod +x wait-for-postgres.sh
 
-RUN go build -o service cmd/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o service cmd/main.go
 
-CMD [ "./service" ]
+FROM alpine:latest
+WORKDIR /app
+COPY --from=builder ./app .
+CMD ["./service"]
