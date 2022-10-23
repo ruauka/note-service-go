@@ -17,7 +17,7 @@ dockerstop:
 	docker-compose stop
 
 migrate-create:
-	migrate create -ext sql -dir ./migrate -seq init
+	migrate create -ext sql -dir ./migrations -seq init
 
 migrate-up:
 	migrate -path ./migrations -database 'postgres://pg:pass@localhost:5432/crud?sslmode=disable' up
