@@ -9,9 +9,11 @@ COPY . .
 ## make wait-for-postgres.sh executable
 #RUN chmod +x wait-for-postgres.sh
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o build/app cmd/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o build/main cmd/main.go
 
 FROM alpine:latest
 WORKDIR /app
-COPY --from=builder ./app .
-CMD ["build/app"]
+COPY --from=builder ./app/config.yml .
+COPY --from=builder ./app/build .
+COPY --from=builder ./app/migrations ./migrations
+CMD ["./main"]

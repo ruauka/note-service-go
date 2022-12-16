@@ -9,10 +9,10 @@ services:
     ports:
       - "80:80"
     depends_on:
-      - go-service
+      - app
 
-  go-service:
-    container_name: go-service
+  app:
+    container_name: app
     build:
       context: .
       dockerfile: Dockerfile
