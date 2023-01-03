@@ -20,21 +20,16 @@ type TestDBClient struct {
 	Client *sqlx.DB
 }
 
-// NewTestDBClient - db Client builder.
+// NewTestDBClient - create connect with SQLite for mock DB tests. Db in memory. DB Client builder.
 func NewTestDBClient() *TestDBClient {
-	return &TestDBClient{
-		Client: NewSQLiteConnect(),
-	}
-}
-
-// NewSQLiteConnect - create connect with SQLite for mock DB tests. Db in memory.
-func NewSQLiteConnect() *sqlx.DB {
 	db, err := sqlx.Open("sqlite3", "file::memory:?cache=shared&_pragma=foreign_keys(1)")
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	return db
+	return &TestDBClient{
+		Client: db,
+	}
 }
 
 // SetUp - create a new migrates before tests.
