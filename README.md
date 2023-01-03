@@ -10,13 +10,13 @@ JWT token authorization is used here.
 
 The project is made using the principles of clean architecture.
 
-The project consists of 3 microservices and each runs in a container in docker-compose:
+The project consists of 3 microservices and each runs in a container with docker-compose:
 1. Nginx
 2. Go-service
 3. PostgreSQL
 
 ## Start
-To start the service run the command in the terminal. This command will launch all the services containers (nginx, service, postgres) and make db migrations:
+To start the service run the command in the terminal. This command will launch all the services containers (nginx, app, database) and make db migrations:
 ```bash
 make dockerup
 ```
@@ -27,7 +27,7 @@ make dockerstop
 ```
 
 ## DB Migrations
-For manual migration settings MacOS users need to run a command in the terminal to install this software:
+For manual migration settings macOS users need to run a command in the terminal to install this software:
 ```bash
 brew install golang-migrate
 ```
