@@ -9,7 +9,9 @@ COPY . .
 ## make wait-for-postgres.sh executable
 #RUN chmod +x wait-for-postgres.sh
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o build/main cmd/main.go
+ARG CGO_ENABLED=0
+ARG GOOS=linux
+RUN go build -o build/main cmd/main.go
 
 FROM alpine:latest
 WORKDIR /app
