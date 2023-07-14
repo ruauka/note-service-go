@@ -1,4 +1,4 @@
-# Attrs-go
+# Note Service
 ![](https://img.shields.io/github/go-mod/go-version/ruauka/note-service-go)
 [![Coverage Status](https://codecov.io/github/ruauka/note-service-go/coverage.svg?branch=master)](https://codecov.io/gh/ruauka/note-service-go)
 [![build](https://github.com/ruauka/note-service-go/actions/workflows/pipeline.yml/badge.svg)](https://github.com/ruauka/note-service-go/actions/workflows/pipeline.yml)
