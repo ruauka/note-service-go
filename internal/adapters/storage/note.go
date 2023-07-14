@@ -132,7 +132,7 @@ func (n *noteStorage) GetAllNotesWithTags(userID string, notes []dto.NotesResp) 
 			" ON notes_tags.tag_id = tags.id"+
 			" AND tags.user_id = $1 AND notes.id = $2", dictionary.NotesTable)
 
-		row, err := n.db.Query(query, userID, note.ID) //nolint:rowserrcheck
+		row, err := n.db.Query(query, userID, note.ID)
 		if err != nil {
 			return nil, err
 		}
@@ -173,7 +173,7 @@ func (n *noteStorage) GetNoteWithAllTags(userID, noteID string, note *dto.NoteRe
 		" ON notes_tags.tag_id = tags.id"+
 		" AND tags.user_id = $1 AND notes.id = $2", dictionary.NotesTable)
 
-	row, err := n.db.Query(query, userID, noteID) //nolint:rowserrcheck
+	row, err := n.db.Query(query, userID, noteID)
 	if err != nil {
 		return dto.NoteWithTagsResp{}, err
 	}

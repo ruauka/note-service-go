@@ -17,7 +17,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-#    command: ./wait-for-postgres.sh database ./service
+    #    command: ./wait-for-postgres.sh database ./service
     ports:
       - "8000:8000"
     restart: always
@@ -36,10 +36,20 @@ services:
       - db:/var/lib/postgresql/data
     restart: always
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}" ]
       interval: 5s
       timeout: 5s
       retries: 5
+
+#  pgadmin:
+#    image: dpage/pgadmin4
+#    container_name: pgadmin
+#    env_file:
+#      - postgres.env
+#    volumes:
+#      - pgadmin:/var/lib/pgadmin
+#    ports:
+#      - "5050:80"
 
 # method for starting database migrations from a container
 #  migrations:
@@ -54,3 +64,4 @@ services:
 
 volumes:
   db:
+#  pgadmin:

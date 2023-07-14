@@ -1,5 +1,7 @@
-FROM golang:1.17.7-alpine3.15 AS builder
+FROM golang:1.19.2-alpine3.15 AS builder
 WORKDIR /app
+COPY go.mod .
+COPY go.sum .
 COPY . .
 
 ## install psql

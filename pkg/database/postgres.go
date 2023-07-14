@@ -50,8 +50,7 @@ func makeMigrations(dsn string) {
 		log.Fatal(err)
 	}
 
-	err = m.Up()
-	if err != nil {
+	if err := m.Up(); err != nil {
 		if errors.Is(err, migrate.ErrNoChange) {
 			log.Printf("No changes in database...\n")
 			return

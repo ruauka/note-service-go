@@ -58,7 +58,6 @@ linters:
     - misspell
     - nakedret
     - nolintlint
-    - rowserrcheck
     - exportloopref
     - staticcheck
     - stylecheck

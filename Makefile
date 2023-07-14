@@ -10,8 +10,11 @@ lint:
 vendor:
 	go mod vendor
 
-dockerup:
+docker_build:
 	docker-compose up -d --build
+
+dockerup:
+	docker-compose up -d
 
 dockerstop:
 	docker-compose stop
